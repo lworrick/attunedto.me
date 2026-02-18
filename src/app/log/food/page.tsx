@@ -13,7 +13,6 @@ export default function LogFoodPage() {
   const supabase = createClient();
   const [text, setText] = useState("");
   const [mealTag, setMealTag] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -21,115 +20,81 @@ export default function LogFoodPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!text.trim()) return;
-    setLoading(true);
-    setSaving(false);
+    setSaving(true);
     setError(null);
     setMessage(null);
 
-    // Safety: never leave the button stuck for more than 25 seconds
-    const safetyTimer = setTimeout(() => {
-      setLoading(false);
+    const textToSave = text;
+    const mealTagToSave = mealTag;
+
+    try {
+      // 1. Save immediately so the user never waits for the estimate
+      const { data: inserted, error: insertErr } = await supabase
+        .from("food_logs")
+        .insert({
+          text: textToSave,
+          meal_tag: mealTagToSave,
+          calories_min: null,
+          calories_max: null,
+          protein_g: null,
+          carbs_g: null,
+          fat_g: null,
+          fiber_g: null,
+          confidence: null,
+          supportive_note: null,
+        })
+        .select("id")
+        .single();
+
       setSaving(false);
-    }, 25000);
-
-    const ESTIMATE_TIMEOUT_MS = 12000; // 12 seconds then give up and save without estimate
-    let aiData: unknown = null;
-    let aiErr: Error | null = null;
-
-    let estimateFailureReason: string | null = null;
-
-    try {
-      const invokePromise = supabase.functions.invoke("food-estimate", {
-        body: { text, meal_tag: mealTag ?? undefined },
-      });
-      const timeoutPromise = new Promise<{ data: null; error: Error }>((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), ESTIMATE_TIMEOUT_MS)
-      );
-      const result = await Promise.race([invokePromise, timeoutPromise]);
-      aiData = result.data;
-      aiErr = result.error ?? null;
-      // Capture why estimate failed (for debugging / user message)
-      if (result.error) {
-        estimateFailureReason = (result.error as { message?: string }).message ?? String(result.error);
-      } else if (result.data && typeof result.data === "object" && "error" in result.data) {
-        const errBody = (result.data as { error?: string; details?: string }).error;
-        estimateFailureReason = errBody ?? "Estimate returned an error";
+      if (insertErr) {
+        setError("Log didn't save. You're still doing your best.");
+        return;
       }
-    } catch (err) {
-      aiErr = err instanceof Error ? err : new Error(String(err));
-      estimateFailureReason = aiErr.message;
-    }
 
-    let calories_min: number | null = null;
-    let calories_max: number | null = null;
-    let protein_g: number | null = null;
-    let carbs_g: number | null = null;
-    let fat_g: number | null = null;
-    let fiber_g: number | null = null;
-    let confidence: string | null = null;
-    let supportive_note: string | null = null;
+      setMessage("Thanks for logging. Estimating nutrition in the background…");
+      setText("");
+      setMealTag(null);
 
-    // Only use as nutrition if we got real data (no "error" key from the function)
-    const hasErrorKey = aiData && typeof aiData === "object" && "error" in aiData;
-    if (!aiErr && aiData && typeof aiData === "object" && !hasErrorKey) {
-      const d = aiData as {
-        calories_min?: number;
-        calories_max?: number;
-        protein_g?: number;
-        carbs_g?: number;
-        fat_g?: number;
-        fiber_g?: number;
-        confidence?: string;
-        supportive_note?: string | null;
-      };
-      calories_min = d.calories_min ?? null;
-      calories_max = d.calories_max ?? null;
-      protein_g = d.protein_g ?? null;
-      carbs_g = d.carbs_g ?? null;
-      fat_g = d.fat_g ?? null;
-      fiber_g = d.fiber_g ?? null;
-      confidence = d.confidence ?? null;
-      supportive_note = d.supportive_note ?? null;
-    }
-
-    // Stop "Estimating..." so we never get stuck; show "Saving..." during insert
-    setLoading(false);
-    setSaving(true);
-
-    try {
-      const { error: insertErr } = await supabase.from("food_logs").insert({
-      text,
-      meal_tag: mealTag,
-      calories_min,
-      calories_max,
-      protein_g,
-      carbs_g,
-      fat_g,
-      fiber_g,
-      confidence,
-      supportive_note,
-    });
-
-    setSaving(false);
-    if (insertErr) {
-      setError("Log didn’t save. You’re still doing your best.");
-      return;
-    }
-    setMessage(
-      supportive_note ??
-        (aiErr || !aiData || hasErrorKey
-          ? estimateFailureReason
-            ? `Logged without estimate. (${estimateFailureReason})`
-            : "Logged without estimate. You're still doing your best."
-          : "Thanks for logging. Data, not drama.")
-    );
-    setText("");
-    setMealTag(null);
+      // 2. Get estimate in the background and update the row when it's ready
+      const rowId = inserted?.id;
+      if (rowId) {
+        supabase.functions
+          .invoke("food-estimate", {
+            body: { text: textToSave, meal_tag: mealTagToSave ?? undefined },
+          })
+          .then(({ data, error: aiErr }) => {
+            if (aiErr || !data || (typeof data === "object" && "error" in data))
+              return;
+            const d = data as {
+              calories_min?: number;
+              calories_max?: number;
+              protein_g?: number;
+              carbs_g?: number;
+              fat_g?: number;
+              fiber_g?: number;
+              confidence?: string;
+              supportive_note?: string | null;
+            };
+            supabase
+              .from("food_logs")
+              .update({
+                calories_min: d.calories_min ?? null,
+                calories_max: d.calories_max ?? null,
+                protein_g: d.protein_g ?? null,
+                carbs_g: d.carbs_g ?? null,
+                fat_g: d.fat_g ?? null,
+                fiber_g: d.fiber_g ?? null,
+                confidence: d.confidence ?? null,
+                supportive_note: d.supportive_note ?? null,
+              })
+              .eq("id", rowId)
+              .then(() => {});
+          });
+      }
     } catch {
       setSaving(false);
       setError("Something went wrong. Try again in a moment.");
-    } finally {
-      clearTimeout(safetyTimer);
     }
   }
 
@@ -166,8 +131,8 @@ export default function LogFoodPage() {
               ))}
             </div>
           </div>
-          <Button type="submit" disabled={(loading || saving) || !text.trim()} className="w-full">
-            {loading ? "Estimating…" : saving ? "Saving…" : "Log food"}
+          <Button type="submit" disabled={saving || !text.trim()} className="w-full">
+            {saving ? "Saving…" : "Log food"}
           </Button>
         </form>
         {error && <p className="mt-3 text-sm text-[var(--adobe)]">{error}</p>}
