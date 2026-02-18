@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { TopBar } from "@/components/TopBar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,8 +15,15 @@ type Props = {
 
 export function SettingsClient({ userId, initialPrefs }: Props) {
   const supabase = createClient();
+  const router = useRouter();
   const [prefs, setPrefs] = useState(initialPrefs);
   const [saved, setSaved] = useState(false);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    router.push("/auth");
+    router.refresh();
+  }
 
   async function upsert() {
     await supabase.from("user_preferences").upsert({
@@ -56,6 +64,12 @@ export function SettingsClient({ userId, initialPrefs }: Props) {
         </Button>
 
         <p className="mt-6 text-xs text-[var(--dust)]">Insights use these when we can. Regenerate from the Trends page for fresh wording.</p>
+
+        <div className="mt-8 pt-6 border-t border-[var(--dust)]">
+          <Button variant="outline" onClick={handleSignOut} className="w-full text-[var(--dust)] border-[var(--dust)] hover:bg-[var(--bone)]">
+            Sign out
+          </Button>
+        </div>
       </div>
     </div>
   );

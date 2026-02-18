@@ -74,21 +74,34 @@ export default function LogFoodPage() {
             }
             const d = data as Record<string, unknown>;
             const num = (v: unknown) => (typeof v === "number" && !Number.isNaN(v) ? v : typeof v === "string" ? Number(v) : null);
+            // Accept snake_case (prompt) or camelCase (model sometimes)
+            const get = (snake: string, camel: string) => d[snake] ?? d[camel];
+            const caloriesMin = num(get("calories_min", "caloriesMin"));
+            const caloriesMax = num(get("calories_max", "caloriesMax"));
+            const proteinG = num(get("protein_g", "proteinG"));
+            const carbsG = num(get("carbs_g", "carbsG"));
+            const fatG = num(get("fat_g", "fatG"));
+            const fiberG = num(get("fiber_g", "fiberG"));
+            const confVal = get("confidence", "confidence");
+            const noteVal = get("supportive_note", "supportiveNote");
+            const confidence = typeof confVal === "string" ? confVal : null;
+            const supportiveNote = typeof noteVal === "string" ? noteVal : null;
             supabase
               .from("food_logs")
               .update({
-                calories_min: num(d.calories_min) ?? null,
-                calories_max: num(d.calories_max) ?? null,
-                protein_g: num(d.protein_g) ?? null,
-                carbs_g: num(d.carbs_g) ?? null,
-                fat_g: num(d.fat_g) ?? null,
-                fiber_g: num(d.fiber_g) ?? null,
-                confidence: typeof d.confidence === "string" ? d.confidence : null,
-                supportive_note: typeof d.supportive_note === "string" ? d.supportive_note : null,
+                calories_min: caloriesMin ?? null,
+                calories_max: caloriesMax ?? null,
+                protein_g: proteinG ?? null,
+                carbs_g: carbsG ?? null,
+                fat_g: fatG ?? null,
+                fiber_g: fiberG ?? null,
+                confidence,
+                supportive_note: supportiveNote,
               })
               .eq("id", rowId)
               .then(({ error: updateErr }) => {
                 if (updateErr) console.error("[food-estimate] DB update failed:", updateErr.message);
+                else console.info("[food-estimate] row updated:", rowId);
               });
           })
           .catch((err) => console.error("[food-estimate] invoke failed:", err));
