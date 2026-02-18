@@ -14,30 +14,56 @@ const items = [
 export function TopBar() {
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-10 flex items-center justify-center px-4 py-3 bg-attune-sand border-b border-attune-stone">
-      <div className="w-full max-w-md lg:max-w-6xl flex items-center justify-between">
-      <Link href="/today" className="text-lg font-semibold text-attune-ink">
-        Attune
-      </Link>
-      <nav className="flex items-center gap-1">
-        {items.map(({ href, label, Icon }) => {
-          const active = pathname === href || (href !== "/today" && pathname.startsWith(href));
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex flex-col items-center gap-0.5 rounded-xl px-3 py-2 tap-target min-w-[56px] ${
-                active ? "bg-attune-stone/80 text-attune-ink" : "text-attune-slate hover:bg-attune-stone/40"
-              }`}
-              aria-current={active ? "page" : undefined}
-            >
-              <Icon className="w-5 h-5 shrink-0" />
-              <span className="text-[10px] font-medium">{label}</span>
-            </Link>
-          );
-        })}
-      </nav>
+    <header className="bg-[var(--bone)] border-b border-[var(--dust)] sticky top-0 z-10 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <Link
+            href="/today"
+            className="text-2xl text-[var(--clay)] hover:text-[var(--adobe)] transition-colors duration-200 font-canela"
+          >
+            Attune
+          </Link>
+          <nav className="hidden md:flex gap-2">
+            {items.map(({ href, label, Icon }) => {
+              const active = pathname === href || (href !== "/today" && pathname.startsWith(href));
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`inline-flex items-center justify-center rounded-lg font-medium gap-2 text-sm px-3 py-1.5 transition-all duration-200 ${
+                    active
+                      ? "bg-[var(--clay)] text-[var(--bone)] hover:bg-[var(--adobe)] shadow-sm"
+                      : "hover:bg-[var(--bone)] text-[var(--basalt)]"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
       </div>
+      {/* Mobile bottom nav */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--bone)] border-t border-[var(--dust)] z-10 shadow-lg">
+        <div className="grid grid-cols-4">
+          {items.map(({ href, label, Icon }) => {
+            const active = pathname === href || (href !== "/today" && pathname.startsWith(href));
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`flex flex-col items-center justify-center py-3 gap-1 transition-colors duration-200 tap-target ${
+                  active ? "text-[var(--clay)]" : "text-[var(--dust)] hover:text-[var(--basalt)]"
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                <span className="text-xs font-medium">{label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </header>
   );
 }

@@ -11,27 +11,21 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: {
-        attune: {
-          sand: "#f5f0e8",
-          stone: "#e8e2d9",
-          sage: "#9caa8f",
-          sageLight: "#c5d4b9",
-          clay: "#c4a77d",
-          clayLight: "#e5d4bc",
-          slate: "#5c6b73",
-          ink: "#2d3436",
-          mist: "#a8b4b8",
-          iconFood: "#c17f59",
-          iconWater: "#6b9b8a",
-          iconCraving: "#c99090",
-          iconMovement: "#8a8f8a",
-          iconSleep: "#b8a078",
-          iconStress: "#a67c6b",
-        },
-      },
       fontFamily: {
-        sans: ["var(--font-attune-sans)", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "Inter", "system-ui", "sans-serif"],
+        canela: ["var(--font-playfair)", "Playfair Display", "Georgia", "serif"],
+      },
+      colors: {
+        /* Figma theme - use CSS vars in components; these are fallbacks */
+        attune: {
+          sand: "#EAE3D6",
+          bone: "#F4EFE6",
+          clay: "#C87A5A",
+          sage: "#7C8A7A",
+          dust: "#B8A999",
+          basalt: "#2F2A26",
+          adobe: "#B65E3C",
+        },
       },
     },
   },

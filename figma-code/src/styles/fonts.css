@@ -1,0 +1,8 @@
+/* Google Fonts: Canela (via similar font - Playfair Display) and Inter */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+
+/* Font family variables */
+:root {
+  --font-canela: 'Playfair Display', serif;
+  --font-inter: 'Inter', sans-serif;
+}

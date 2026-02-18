@@ -4,6 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { TopBar } from "@/components/TopBar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const CATEGORIES = ["sweet", "salty", "crunchy", "creamy", "comforting", "quick energy"];
 
@@ -50,58 +54,59 @@ export default function LogCravingPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-attune-sand">
+    <div className="min-h-screen flex flex-col bg-[var(--sand)]">
       <TopBar />
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 max-w-md mx-auto">
-        <Link href="/today" className="text-sm text-attune-slate mb-4 inline-block">← Today</Link>
-        <h1 className="text-xl font-semibold text-attune-ink mb-1">Log craving</h1>
-        <p className="text-sm text-attune-slate mb-4">No judgment. Sometimes a gentle alternative helps; sometimes honoring it does.</p>
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-24 md:pb-8 max-w-7xl mx-auto w-full">
+        <Link href="/today" className="text-sm text-[var(--dust)] mb-4 inline-block">← Today</Link>
+        <h1 className="text-2xl font-canela text-[var(--basalt)] mb-1">Log craving</h1>
+        <p className="text-sm text-[var(--dust)] mb-4">No judgment. Sometimes a gentle alternative helps; sometimes honoring it does.</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
+          <Input
             type="text"
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="What are you craving?"
-            className="w-full rounded-2xl border border-attune-stone bg-white px-3 py-2 text-sm text-attune-ink placeholder:text-attune-mist focus:border-attune-sage focus:outline-none"
           />
           <div>
-            <p className="text-xs text-attune-slate mb-1">Intensity (1–5)</p>
-            <input type="range" min={1} max={5} value={intensity} onChange={(e) => setIntensity(Number(e.target.value))} className="w-full" />
-            <span className="text-xs text-attune-slate">{intensity}</span>
+            <Label className="text-xs text-[var(--dust)] mb-1 block">Intensity (1–5)</Label>
+            <input type="range" min={1} max={5} value={intensity} onChange={(e) => setIntensity(Number(e.target.value))} className="w-full accent-[var(--clay)]" />
+            <span className="text-xs text-[var(--dust)]">{intensity}</span>
           </div>
           <div>
-            <p className="text-xs text-attune-slate mb-2">Category (optional)</p>
+            <Label className="text-xs text-[var(--dust)] mb-2 block">Category (optional)</Label>
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map((c) => (
-                <button key={c} type="button" onClick={() => setCategory(category === c ? null : c)} className={`rounded-full px-3 py-1 text-xs border tap-target ${category === c ? "bg-attune-sage text-white border-attune-sage" : "border-attune-stone text-attune-slate"}`}>
+                <Button key={c} type="button" variant={category === c ? "primary" : "outline"} size="sm" className="rounded-full" onClick={() => setCategory(category === c ? null : c)}>
                   {c}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
-          <button type="submit" disabled={loading || !text.trim()} className="w-full rounded-xl bg-attune-sage text-white py-3 text-sm font-medium disabled:opacity-60 tap-target">
+          <Button type="submit" disabled={loading || !text.trim()} className="w-full">
             {loading ? "Thinking…" : "Get gentle suggestions"}
-          </button>
+          </Button>
         </form>
 
         {suggestions && (
-          <div className="mt-6 rounded-2xl bg-white/80 border border-attune-stone p-4 text-sm space-y-3">
-            {suggestions.alternatives?.length ? (
-              <div>
-                <p className="text-xs text-attune-slate mb-1">Alternatives you might try</p>
-                <ul className="list-disc list-inside text-attune-ink space-y-1">{suggestions.alternatives.map((a, i) => <li key={i}>{a}</li>)}</ul>
-              </div>
-            ) : null}
-            {suggestions.honor_option && <p className="text-attune-slate">{suggestions.honor_option}</p>}
-            {suggestions.suggestion && <p className="text-attune-slate">{suggestions.suggestion}</p>}
-            {!saved && text.trim() && (
-              <button onClick={saveLog} className="rounded-xl bg-attune-sage text-white py-2 px-4 text-sm tap-target">
-                Save to my log
-              </button>
-            )}
-            {saved && <p className="text-attune-slate">Saved. Thanks for logging.</p>}
-          </div>
+          <Card className="mt-6">
+            <CardContent className="p-4 text-sm space-y-3">
+              {suggestions.alternatives?.length ? (
+                <div>
+                  <p className="text-xs text-[var(--dust)] mb-1">Alternatives you might try</p>
+                  <ul className="list-disc list-inside text-[var(--basalt)] space-y-1">{suggestions.alternatives.map((a, i) => <li key={i}>{a}</li>)}</ul>
+                </div>
+              ) : null}
+              {suggestions.honor_option && <p className="text-[var(--dust)]">{suggestions.honor_option}</p>}
+              {suggestions.suggestion && <p className="text-[var(--dust)]">{suggestions.suggestion}</p>}
+              {!saved && text.trim() && (
+                <Button onClick={saveLog} size="sm">
+                  Save to my log
+                </Button>
+              )}
+              {saved && <p className="text-[var(--dust)]">Saved. Thanks for logging.</p>}
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

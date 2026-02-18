@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { TopBar } from "@/components/TopBar";
+import { Button } from "@/components/ui/button";
 
 type Tab = "food" | "water" | "cravings" | "movement" | "sleep" | "stress";
 
@@ -58,33 +59,39 @@ export function HistoryClient() {
   const tabLabels: Record<Tab, string> = { food: "Food", water: "Water", cravings: "Cravings", movement: "Movement", sleep: "Sleep", stress: "Stress" };
 
   return (
-    <div className="min-h-screen flex flex-col bg-attune-sand">
+    <div className="min-h-screen flex flex-col bg-[var(--sand)]">
       <TopBar />
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 max-w-md mx-auto">
-        <h1 className="text-xl font-semibold text-attune-ink mb-1">History</h1>
-        <p className="text-sm text-attune-slate mb-4">A gentle look back at what you’ve logged.</p>
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-24 md:pb-8 max-w-7xl mx-auto w-full">
+        <h1 className="text-2xl font-canela text-[var(--basalt)] mb-1">History</h1>
+        <p className="text-sm text-[var(--dust)] mb-4">A gentle look back at what you’ve logged.</p>
 
         <div className="flex gap-1 mb-4 overflow-x-auto pb-1">
           {tabs.map((t) => (
-            <button key={t} onClick={() => { setTab(t); setLoading(true); }} className={`shrink-0 rounded-full px-3 py-1 text-xs border tap-target ${tab === t ? "bg-attune-sage text-white border-attune-sage" : "border-attune-stone text-attune-slate"}`}>
-              {tabLabels[t]}
-            </button>
+            <Button
+            key={t}
+            variant={tab === t ? "primary" : "outline"}
+            size="sm"
+            className="shrink-0 rounded-full"
+            onClick={() => { setTab(t); setLoading(true); }}
+          >
+            {tabLabels[t]}
+          </Button>
           ))}
         </div>
 
-        {loading && <p className="text-sm text-attune-slate">Loading…</p>}
-        {!loading && Object.keys(grouped).length === 0 && <p className="text-sm text-attune-slate">Nothing logged here yet. That’s okay.</p>}
+        {loading && <p className="text-sm text-[var(--dust)]">Loading…</p>}
+        {!loading && Object.keys(grouped).length === 0 && <p className="text-sm text-[var(--dust)]">Nothing logged here yet. That’s okay.</p>}
         {!loading &&
           Object.entries(grouped).map(([day, list]) => (
             <section key={day} className="mb-4">
-              <p className="text-xs text-attune-slate mb-2">{day}</p>
+              <p className="text-xs text-[var(--dust)] mb-2">{day}</p>
               <div className="space-y-2">
                 {list.map((row) => (
-                  <div key={String(row.id)} className="flex items-center justify-between rounded-xl bg-white/80 border border-attune-stone px-3 py-2 text-sm">
-                    <span className="flex-1 pr-2 text-attune-ink truncate">{getLabel(row)}</span>
-                    <button onClick={() => handleDelete(String(row.id))} className="text-xs text-attune-mist hover:text-attune-slate shrink-0">
+                  <div key={String(row.id)} className="flex items-center justify-between rounded-lg border border-[var(--dust)] bg-[var(--bone)] px-3 py-2 text-sm">
+                    <span className="flex-1 pr-2 text-[var(--basalt)] truncate">{getLabel(row)}</span>
+                    <Button variant="ghost" size="sm" className="shrink-0 text-xs text-[var(--dust)]" onClick={() => handleDelete(String(row.id))}>
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>

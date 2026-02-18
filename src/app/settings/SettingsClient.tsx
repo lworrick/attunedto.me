@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { TopBar } from "@/components/TopBar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 type Props = {
   userId: string;
@@ -28,32 +30,32 @@ export function SettingsClient({ userId, initialPrefs }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-attune-sand">
+    <div className="min-h-screen flex flex-col bg-[var(--sand)]">
       <TopBar />
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 max-w-md mx-auto">
-        <h1 className="text-xl font-semibold text-attune-ink mb-1">Settings</h1>
-        <p className="text-sm text-attune-slate mb-6">Preferences that shape how Attune talks to you.</p>
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-24 md:pb-8 max-w-7xl mx-auto w-full">
+        <h1 className="text-2xl font-canela text-[var(--basalt)] mb-1">Settings</h1>
+        <p className="text-sm text-[var(--dust)] mb-6">Preferences that shape how Attune talks to you.</p>
 
         <div className="space-y-4">
-          <label className="flex items-center justify-between rounded-xl bg-white/80 border border-attune-stone px-3 py-3">
-            <span className="text-sm text-attune-ink">Vegetarian dietary preference</span>
-            <input type="checkbox" checked={prefs.dietary_vegetarian} onChange={(e) => setPrefs((p) => ({ ...p, dietary_vegetarian: e.target.checked }))} className="rounded" />
-          </label>
-          <label className="flex items-center justify-between rounded-xl bg-white/80 border border-attune-stone px-3 py-3">
-            <span className="text-sm text-attune-ink">Avoid weight-focused language</span>
-            <input type="checkbox" checked={prefs.avoid_weight_language} onChange={(e) => setPrefs((p) => ({ ...p, avoid_weight_language: e.target.checked }))} className="rounded" />
-          </label>
-          <label className="flex items-center justify-between rounded-xl bg-white/80 border border-attune-stone px-3 py-3">
-            <span className="text-sm text-attune-ink">Use ounces (turn off for ml)</span>
-            <input type="checkbox" checked={prefs.units_oz} onChange={(e) => setPrefs((p) => ({ ...p, units_oz: e.target.checked }))} className="rounded" />
-          </label>
+          <Card className="flex items-center justify-between px-4 py-3">
+            <Label className="text-sm text-[var(--basalt)] cursor-pointer flex-1">Vegetarian dietary preference</Label>
+            <input type="checkbox" checked={prefs.dietary_vegetarian} onChange={(e) => setPrefs((p) => ({ ...p, dietary_vegetarian: e.target.checked }))} className="rounded border-[var(--dust)]" />
+          </Card>
+          <Card className="flex items-center justify-between px-4 py-3">
+            <Label className="text-sm text-[var(--basalt)] cursor-pointer flex-1">Avoid weight-focused language</Label>
+            <input type="checkbox" checked={prefs.avoid_weight_language} onChange={(e) => setPrefs((p) => ({ ...p, avoid_weight_language: e.target.checked }))} className="rounded border-[var(--dust)]" />
+          </Card>
+          <Card className="flex items-center justify-between px-4 py-3">
+            <Label className="text-sm text-[var(--basalt)] cursor-pointer flex-1">Use ounces (turn off for ml)</Label>
+            <input type="checkbox" checked={prefs.units_oz} onChange={(e) => setPrefs((p) => ({ ...p, units_oz: e.target.checked }))} className="rounded border-[var(--dust)]" />
+          </Card>
         </div>
 
-        <button onClick={upsert} className="mt-6 w-full rounded-xl bg-attune-sage text-white py-3 text-sm font-medium tap-target">
+        <Button onClick={upsert} className="mt-6 w-full">
           {saved ? "Saved" : "Save preferences"}
-        </button>
+        </Button>
 
-        <p className="mt-6 text-xs text-attune-slate">Insights use these when we can. Regenerate from the Trends page for fresh wording.</p>
+        <p className="mt-6 text-xs text-[var(--dust)]">Insights use these when we can. Regenerate from the Trends page for fresh wording.</p>
       </div>
     </div>
   );

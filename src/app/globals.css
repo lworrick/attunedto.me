@@ -2,42 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Attune theme from Figma */
 :root {
-  --attune-sand: #f5f0e8;
-  --attune-stone: #e8e2d9;
-  --attune-sage: #9caa8f;
-  --attune-sage-light: #c5d4b9;
-  --attune-clay: #c4a77d;
-  --attune-clay-light: #e5d4bc;
-  --attune-slate: #5c6b73;
-  --attune-ink: #2d3436;
-  --attune-mist: #a8b4b8;
+  --font-size: 16px;
+  --sand: #EAE3D6;
+  --bone: #F4EFE6;
+  --clay: #C87A5A;
+  --sage: #7C8A7A;
+  --dust: #B8A999;
+  --basalt: #2F2A26;
+  --adobe: #B65E3C;
+  --radius: 0.75rem;
+  --font-canela: var(--font-playfair), 'Playfair Display', Georgia, serif;
+  --font-inter: var(--font-sans), 'Inter', system-ui, sans-serif;
 }
 
 body {
-  background-color: var(--attune-sand);
-  color: var(--attune-ink);
+  background-color: var(--sand);
+  color: var(--basalt);
   min-height: 100dvh;
+  font-family: var(--font-inter);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Calming focus states */
 *:focus-visible {
-  outline: 2px solid var(--attune-sage);
+  outline: 2px solid var(--clay);
   outline-offset: 2px;
 }
 
-/* Soft tap targets on mobile */
 @media (pointer: coarse) {
   .tap-target {
     min-height: 44px;
     min-width: 44px;
   }
-}
-
-/* Card-style links and buttons feel softer */
-a.tap-target,
-button.tap-target {
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }

@@ -4,6 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { TopBar } from "@/components/TopBar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const QUALITY_LABELS: Record<number, string> = { 1: "Very poor", 2: "Poor", 3: "Okay", 4: "Good", 5: "Excellent" };
 
@@ -32,32 +35,32 @@ export default function LogSleepPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-attune-sand">
+    <div className="min-h-screen flex flex-col bg-[var(--sand)]">
       <TopBar />
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 max-w-md mx-auto">
-        <Link href="/today" className="text-sm text-attune-slate mb-4 inline-block">← Today</Link>
-        <h1 className="text-xl font-semibold text-attune-ink mb-1">Log sleep</h1>
-        <p className="text-sm text-attune-slate mb-6">How did sleep feel? No judgment.</p>
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-24 md:pb-8 max-w-7xl mx-auto w-full">
+        <Link href="/today" className="text-sm text-[var(--dust)] mb-4 inline-block">← Today</Link>
+        <h1 className="text-2xl font-canela text-[var(--basalt)] mb-1">Log sleep</h1>
+        <p className="text-sm text-[var(--dust)] mb-6">How did sleep feel? No judgment.</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <p className="text-xs text-attune-slate mb-2">Sleep quality</p>
-            <input type="range" min={1} max={5} value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="w-full mb-1" />
-            <p className="text-sm text-attune-ink">{QUALITY_LABELS[quality]}</p>
+            <Label className="text-xs text-[var(--dust)] mb-2 block">Sleep quality</Label>
+            <input type="range" min={1} max={5} value={quality} onChange={(e) => setQuality(Number(e.target.value))} className="w-full mb-1 accent-[var(--clay)]" />
+            <p className="text-sm text-[var(--basalt)]">{QUALITY_LABELS[quality]}</p>
           </div>
           <div>
-            <label className="block text-xs text-attune-slate mb-1">Hours slept (optional)</label>
-            <input type="number" min={0} max={24} step={0.5} value={hours} onChange={(e) => setHours(e.target.value)} placeholder="e.g. 7" className="w-full rounded-xl border border-attune-stone bg-white px-3 py-2 text-sm text-attune-ink focus:border-attune-sage focus:outline-none" />
+            <Label htmlFor="hours" className="block text-xs text-[var(--dust)] mb-1">Hours slept (optional)</Label>
+            <Input id="hours" type="number" min={0} max={24} step={0.5} value={hours} onChange={(e) => setHours(e.target.value)} placeholder="e.g. 7" />
           </div>
           <div>
-            <label className="block text-xs text-attune-slate mb-1">Notes (optional)</label>
-            <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. woke up often, felt rested" className="w-full rounded-xl border border-attune-stone bg-white px-3 py-2 text-sm text-attune-ink placeholder:text-attune-mist focus:border-attune-sage focus:outline-none" />
+            <Label htmlFor="notes" className="block text-xs text-[var(--dust)] mb-1">Notes (optional)</Label>
+            <Input id="notes" type="text" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="e.g. woke up often, felt rested" />
           </div>
-          <button type="submit" className="w-full rounded-xl bg-attune-sage text-white py-3 text-sm font-medium tap-target">
+          <Button type="submit" className="w-full">
             Save sleep log
-          </button>
+          </Button>
         </form>
-        {message && <p className="mt-4 text-sm text-attune-slate bg-white/70 border border-attune-stone rounded-lg px-3 py-2">{message}</p>}
+        {message && <p className="mt-4 text-sm text-[var(--dust)] bg-[var(--bone)] border border-[var(--dust)] rounded-lg px-3 py-2">{message}</p>}
       </div>
     </div>
   );

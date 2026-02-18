@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { TopBar } from "@/components/TopBar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   IconFood,
   IconWater,
@@ -25,12 +27,12 @@ type Props = {
 };
 
 const QUICK_LOGS = [
-  { href: "/log/food", label: "Log Food", Icon: IconFood, color: "text-attune-iconFood" },
-  { href: "/log/water", label: "Log Water", Icon: IconWater, color: "text-attune-iconWater" },
-  { href: "/log/craving", label: "Log Craving", Icon: IconCraving, color: "text-attune-iconCraving" },
-  { href: "/log/movement", label: "Log Movement", Icon: IconMovement, color: "text-attune-iconMovement" },
-  { href: "/log/sleep", label: "Log Sleep", Icon: IconSleep, color: "text-attune-iconSleep" },
-  { href: "/log/stress", label: "Log Stress", Icon: IconStress, color: "text-attune-iconStress" },
+  { href: "/log/food", label: "Log Food", Icon: IconFood, bgColor: "rgba(200, 122, 90, 0.12)", iconColor: "var(--clay)" },
+  { href: "/log/water", label: "Log Water", Icon: IconWater, bgColor: "rgba(124, 138, 122, 0.12)", iconColor: "var(--sage)" },
+  { href: "/log/craving", label: "Log Craving", Icon: IconCraving, bgColor: "rgba(182, 94, 60, 0.12)", iconColor: "var(--adobe)" },
+  { href: "/log/movement", label: "Log Movement", Icon: IconMovement, bgColor: "rgba(124, 138, 122, 0.12)", iconColor: "var(--sage)" },
+  { href: "/log/sleep", label: "Log Sleep", Icon: IconSleep, bgColor: "rgba(184, 169, 153, 0.12)", iconColor: "var(--dust)" },
+  { href: "/log/stress", label: "Log Stress", Icon: IconStress, bgColor: "rgba(200, 122, 90, 0.12)", iconColor: "var(--clay)" },
 ] as const;
 
 function formatTodayDate() {
@@ -65,7 +67,6 @@ export function TodayClient(props: Props) {
 
   function handleGenerateInsights() {
     setInsightsLoading(true);
-    // Re-trigger snapshot fetch; in a full implementation you might call trend-insights for 14 days
     supabase.functions.invoke("daily-summary", {
       body: {
         nutrition: props.nutrition ? { calories_min: props.nutrition.min, calories_max: props.nutrition.max, protein: props.nutrition.protein, fiber: props.nutrition.fiber } : null,
@@ -84,93 +85,146 @@ export function TodayClient(props: Props) {
   const hasSnapshot = snapshot?.summary_text || snapshot?.suggestion || snapshot?.supportive_line;
 
   return (
-    <div className="min-h-screen flex flex-col bg-attune-sand">
+    <div className="min-h-screen bg-[var(--sand)]">
       <TopBar />
-      <div className="flex-1 overflow-y-auto px-4 pb-8 pt-4 w-full max-w-md lg:max-w-6xl mx-auto">
-        <header className="mb-6">
-          <h1 className="text-2xl font-bold text-attune-ink">Today</h1>
-          <p className="text-sm text-attune-slate mt-0.5">{formatTodayDate()}</p>
-        </header>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 md:pb-8">
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl text-[var(--basalt)] font-canela">Today</h1>
+            <p className="text-[var(--dust)] mt-1">{formatTodayDate()}</p>
+          </div>
 
-        <section className="mb-6">
-          <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
-            {QUICK_LOGS.map(({ href, label, Icon, color }) => (
-              <Link
-                key={href}
-                href={href}
-                className="rounded-2xl bg-white/90 border border-attune-stone shadow-sm flex flex-col items-center justify-center py-5 gap-2 tap-target hover:bg-attune-stone/20 transition min-h-[100px] overflow-visible"
-              >
-                <span className="flex items-center justify-center w-10 h-10 shrink-0 overflow-visible">
-                  <Icon className={`w-8 h-8 shrink-0 ${color}`} />
-                </span>
-                <span className="text-sm font-medium text-attune-ink">{label}</span>
+          {/* Quick Actions - Figma style */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {QUICK_LOGS.map(({ href, label, Icon, bgColor, iconColor }) => (
+              <Link key={href} href={href}>
+                <button
+                  type="button"
+                  className="w-full h-auto py-6 flex flex-col gap-3 rounded-xl border border-[var(--dust)] bg-[var(--bone)] shadow-sm hover:shadow-md transition-all duration-200 tap-target text-left items-center"
+                >
+                  <div
+                    className="h-12 w-12 rounded-full flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: bgColor }}
+                  >
+                    <Icon className="h-6 w-6" style={{ color: iconColor }} />
+                  </div>
+                  <span className="text-sm font-medium text-[var(--basalt)]">{label}</span>
+                </button>
               </Link>
             ))}
           </div>
-        </section>
 
-        <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:mb-6">
-          <section className="mb-6 lg:mb-0">
-            <div className="rounded-2xl bg-white/90 border border-attune-stone shadow-sm p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 h-full">
-              <div>
-                <h2 className="font-semibold text-attune-ink">Want personalized insights?</h2>
-                <p className="text-sm text-attune-slate mt-0.5">Generate AI insights from your last 14 days of tracking.</p>
+          {/* Generate insights - Figma style */}
+          <Card className="bg-gradient-to-br from-[rgba(124,138,122,0.08)] to-[rgba(200,122,90,0.08)] border-[var(--sage)]">
+            <CardContent className="pt-5 pb-5">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <IconSparkle className="h-4 w-4 text-[var(--sage)] shrink-0" />
+                    <p className="text-sm font-medium text-[var(--basalt)]">Want personalized insights?</p>
+                  </div>
+                  <p className="text-xs text-[var(--dust)]">Generate AI insights from your last 14 days of tracking</p>
+                </div>
+                <Button
+                  onClick={handleGenerateInsights}
+                  disabled={insightsLoading}
+                  size="sm"
+                  className="shrink-0"
+                >
+                  <IconSparkle className="h-4 w-4 mr-2" />
+                  {insightsLoading ? "Generating…" : "Generate"}
+                </Button>
               </div>
-              <button
-                type="button"
-                onClick={handleGenerateInsights}
-                disabled={insightsLoading}
-                className="shrink-0 rounded-xl bg-attune-stone/80 hover:bg-attune-stone text-attune-ink font-medium py-2 px-4 flex items-center gap-2 tap-target disabled:opacity-60"
-              >
-                <IconSparkle className="w-4 h-4" />
-                {insightsLoading ? "Generating…" : "Generate"}
-              </button>
-            </div>
-          </section>
-          <section>
-            <div className="rounded-2xl bg-white/90 border border-attune-stone shadow-sm p-4 h-full">
+            </CardContent>
+          </Card>
+
+          {/* Welcome / Daily snapshot - Figma style */}
+          <Card className={hasSnapshot ? "" : "bg-gradient-to-br from-[var(--bone)] to-[var(--sand)]"}>
+            <CardContent className="pt-6">
               {hasSnapshot ? (
                 <div className="text-sm space-y-2">
-                  <h2 className="font-semibold text-attune-ink">Daily snapshot</h2>
-                  {snapshot?.summary_text && <p className="whitespace-pre-line text-attune-ink">{snapshot.summary_text}</p>}
-                  {snapshot?.suggestion && <p className="text-attune-slate">If you’d like to try: {snapshot.suggestion}</p>}
-                  {snapshot?.supportive_line && <p className="text-attune-slate">{snapshot.supportive_line}</p>}
+                  <h3 className="text-lg font-medium leading-none tracking-tight mb-2">Daily snapshot</h3>
+                  {snapshot?.summary_text && <p className="whitespace-pre-line text-[var(--basalt)]">{snapshot.summary_text}</p>}
+                  {snapshot?.suggestion && <p className="text-[var(--dust)]">If you’d like to try: {snapshot.suggestion}</p>}
+                  {snapshot?.supportive_line && <p className="text-[var(--clay)] italic">{snapshot.supportive_line}</p>}
                 </div>
               ) : (
-                <>
-                  <h2 className="font-semibold text-attune-ink">Welcome to a fresh day!</h2>
-                  <p className="text-attune-slate mt-2 text-sm">
+                <div className="text-center">
+                  <p className="text-lg text-[var(--basalt)] mb-2">Welcome to a fresh day! 🌅</p>
+                  <p className="text-[var(--dust)]">
                     Start by logging your first activity using the buttons above. Your daily summary will appear here as you track your wellness journey.
                   </p>
-                  {snapshotError && <p className="text-attune-slate text-sm mt-2">{snapshotError}</p>}
-                </>
+                  {snapshotError && <p className="text-[var(--dust)] text-sm mt-2">{snapshotError}</p>}
+                </div>
               )}
-            </div>
-          </section>
-        </div>
+            </CardContent>
+          </Card>
 
-        <section className="mt-6">
-          <h2 className="text-xs font-medium text-attune-slate uppercase tracking-wide mb-3">Today’s totals</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <SummaryCard title="Estimated energy" value={props.nutrition ? `${props.nutrition.min}–${props.nutrition.max} kcal (approx.)` : "Not logged yet"} subtitle="Rough range only." />
-            <SummaryCard title="Protein & fiber" value={props.nutrition ? `${Math.round(props.nutrition.protein)} g protein · ${Math.round(props.nutrition.fiber)} g fiber` : "Not logged yet"} />
-            <SummaryCard title="Water" value={props.waterTotal ? `${props.waterTotal} oz` : "Not logged yet"} />
-            <SummaryCard title="Movement" value={props.movement ? `${props.movement.minutes} min · ~${props.movement.burnMin}–${props.movement.burnMax} kcal` : "Not logged yet"} />
-            <SummaryCard title="Cravings" value={props.cravingsCount ? `${props.cravingsCount} logged` : "Not logged yet"} />
-            <SummaryCard title="Sleep & stress" value={props.sleepAvg != null || props.stressAvg != null ? `Sleep ~${(props.sleepAvg ?? "–")}/5 · Stress ~${(props.stressAvg ?? "–")}/5` : "Not logged yet"} />
+          {/* Today's totals - Figma style cards */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Nutrition</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm text-[var(--dust)]">Estimated calories</p>
+                  <p className="text-2xl font-medium text-[var(--basalt)]">
+                    {props.nutrition && props.nutrition.min > 0
+                      ? `${props.nutrition.min}–${props.nutrition.max} (approx.)`
+                      : "—"}
+                  </p>
+                </div>
+                <div className="flex gap-4 text-sm">
+                  <div>
+                    <p className="text-xs text-[var(--dust)]">Protein</p>
+                    <p className="font-medium text-[var(--basalt)]">{props.nutrition ? Math.round(props.nutrition.protein) : 0}g</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[var(--dust)]">Fiber</p>
+                    <p className="font-medium text-[var(--basalt)]">{props.nutrition ? Math.round(props.nutrition.fiber) : 0}g</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Hydration & Movement</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm text-[var(--dust)]">Water</p>
+                  <p className="text-2xl font-medium text-[var(--basalt)]">{props.waterTotal || 0} oz</p>
+                </div>
+                <div>
+                  <p className="text-sm text-[var(--dust)]">Movement</p>
+                  <p className="text-2xl font-medium text-[var(--basalt)]">{props.movement?.minutes ?? 0} min</p>
+                  {props.movement && (props.movement.burnMin > 0 || props.movement.burnMax > 0) && (
+                    <p className="text-xs text-[var(--dust)] mt-1">Est. {props.movement.burnMin}–{props.movement.burnMax} cal burned</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Cravings & Sleep</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <p className="text-sm text-[var(--dust)]">Cravings logged</p>
+                  <p className="text-2xl font-medium text-[var(--basalt)]">{props.cravingsCount ?? 0}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-[var(--dust)]">Sleep & stress</p>
+                  <p className="font-medium text-[var(--basalt)]">
+                    Sleep ~{props.sleepAvg != null ? props.sleepAvg.toFixed(1) : "–"}/5 · Stress ~{props.stressAvg != null ? props.stressAvg.toFixed(1) : "–"}/5
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </section>
-      </div>
-    </div>
-  );
-}
-
-function SummaryCard({ title, value, subtitle }: { title: string; value: string; subtitle?: string }) {
-  return (
-    <div className="rounded-2xl bg-white/90 border border-attune-stone shadow-sm p-3">
-      <p className="text-xs text-attune-slate mb-1">{title}</p>
-      <p className="text-sm font-semibold text-attune-ink">{value}</p>
-      {subtitle && <p className="text-xs text-attune-mist mt-1">{subtitle}</p>}
+        </div>
+      </main>
     </div>
   );
 }
