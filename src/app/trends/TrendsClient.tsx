@@ -164,15 +164,15 @@ export function TrendsClient() {
                       <CartesianGrid strokeDasharray="3 3" stroke="var(--dust)" opacity={0.3} />
                       <XAxis dataKey="label" tick={{ fontSize: 11 }} stroke="var(--dust)" />
                       <YAxis tick={{ fontSize: 11 }} stroke="var(--dust)" width={24} />
-                      <Tooltip
+                      <Tooltip<number, string>
                         contentStyle={{
                           backgroundColor: "var(--bone)",
                           border: "1px solid var(--dust)",
                           borderRadius: 8,
                         }}
                       />
-                      <Line type="monotone" dataKey="protein" stroke="var(--clay)" strokeWidth={2} dot={{ r: 3 }} name="protein (g)" />
-                      <Line type="monotone" dataKey="fiber" stroke="var(--sage)" strokeWidth={2} dot={{ r: 3 }} name="fiber (g)" />
+                      <Line type="monotone" dataKey="protein" stroke="var(--clay)" strokeWidth={2} dot={{ r: 3 }} name="Protein (g)" />
+                      <Line type="monotone" dataKey="fiber" stroke="var(--sage)" strokeWidth={2} dot={{ r: 3 }} name="Fiber (g)" />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
