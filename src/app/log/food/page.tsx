@@ -56,18 +56,12 @@ export default function LogFoodPage() {
       setText("");
       setMealTag(null);
 
-      // 2. Get estimate in the background and update the row when it's ready.
-      // Call the function with the anon key so the gateway accepts the request (avoids 401 with session JWT).
+      // 2. Get estimate in the background via our API route (server calls Edge Function with anon key).
       const rowId = inserted?.id;
       if (rowId) {
-        const fnUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/food-estimate`;
-        const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-        fetch(fnUrl, {
+        fetch("/api/food-estimate", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${anonKey}`,
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: textToSave, meal_tag: mealTagToSave ?? undefined }),
         })
           .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
