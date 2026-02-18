@@ -106,7 +106,9 @@ export function TodayClient(props: Props) {
                     className="h-12 w-12 rounded-full flex items-center justify-center shrink-0"
                     style={{ backgroundColor: bgColor }}
                   >
-                    <Icon className="h-6 w-6" style={{ color: iconColor }} />
+                    <span style={{ color: iconColor }}>
+                      <Icon className="h-6 w-6" />
+                    </span>
                   </div>
                   <span className="text-sm font-medium text-[var(--basalt)]">{label}</span>
                 </button>

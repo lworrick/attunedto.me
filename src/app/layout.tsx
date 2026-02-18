@@ -14,6 +14,8 @@ const playfair = Playfair_Display({
   weight: ["400", "500"],
 });
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Attune — Gentle wellness tracking",
   description: "Body-neutral tracking for food, water, movement, sleep, and stress.",
