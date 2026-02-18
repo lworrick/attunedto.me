@@ -114,6 +114,36 @@ drop policy if exists "Users can CRUD own sleep_logs" on public.sleep_logs;
 drop policy if exists "Users can CRUD own stress_logs" on public.stress_logs;
 drop policy if exists "Users can CRUD own user_preferences" on public.user_preferences;
 
+-- Drop per-action policies so this migration can be re-run safely
+drop policy if exists "Select own food_logs" on public.food_logs;
+drop policy if exists "Insert own food_logs" on public.food_logs;
+drop policy if exists "Update own food_logs" on public.food_logs;
+drop policy if exists "Delete own food_logs" on public.food_logs;
+drop policy if exists "Select own water_logs" on public.water_logs;
+drop policy if exists "Insert own water_logs" on public.water_logs;
+drop policy if exists "Update own water_logs" on public.water_logs;
+drop policy if exists "Delete own water_logs" on public.water_logs;
+drop policy if exists "Select own craving_logs" on public.craving_logs;
+drop policy if exists "Insert own craving_logs" on public.craving_logs;
+drop policy if exists "Update own craving_logs" on public.craving_logs;
+drop policy if exists "Delete own craving_logs" on public.craving_logs;
+drop policy if exists "Select own movement_logs" on public.movement_logs;
+drop policy if exists "Insert own movement_logs" on public.movement_logs;
+drop policy if exists "Update own movement_logs" on public.movement_logs;
+drop policy if exists "Delete own movement_logs" on public.movement_logs;
+drop policy if exists "Select own sleep_logs" on public.sleep_logs;
+drop policy if exists "Insert own sleep_logs" on public.sleep_logs;
+drop policy if exists "Update own sleep_logs" on public.sleep_logs;
+drop policy if exists "Delete own sleep_logs" on public.sleep_logs;
+drop policy if exists "Select own stress_logs" on public.stress_logs;
+drop policy if exists "Insert own stress_logs" on public.stress_logs;
+drop policy if exists "Update own stress_logs" on public.stress_logs;
+drop policy if exists "Delete own stress_logs" on public.stress_logs;
+drop policy if exists "Select own user_preferences" on public.user_preferences;
+drop policy if exists "Insert own user_preferences" on public.user_preferences;
+drop policy if exists "Update own user_preferences" on public.user_preferences;
+drop policy if exists "Delete own user_preferences" on public.user_preferences;
+
 create policy "Select own food_logs" on public.food_logs for select using (auth.uid() = user_id);
 create policy "Insert own food_logs" on public.food_logs for insert with check (auth.uid() = user_id);
 create policy "Update own food_logs" on public.food_logs for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
