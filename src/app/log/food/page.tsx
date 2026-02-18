@@ -56,12 +56,17 @@ export default function LogFoodPage() {
       setText("");
       setMealTag(null);
 
-      // 2. Get estimate in the background via our API route (server calls Edge Function with anon key).
+      // 2. Get estimate in the background. Call Edge Function directly with anon key (works on Vercel when env is set at build).
       const rowId = inserted?.id;
-      if (rowId) {
-        fetch("/api/food-estimate", {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (rowId && supabaseUrl && anonKey) {
+        fetch(`${supabaseUrl}/functions/v1/food-estimate`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${anonKey}`,
+          },
           body: JSON.stringify({ text: textToSave, meal_tag: mealTagToSave ?? undefined }),
         })
           .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
@@ -104,6 +109,8 @@ export default function LogFoodPage() {
               });
           })
           .catch((err) => console.error("[food-estimate] invoke failed:", err));
+      } else if (rowId && (!supabaseUrl || !anonKey)) {
+        console.warn("[food-estimate] missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY");
       }
     } catch {
       setSaving(false);
