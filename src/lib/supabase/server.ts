@@ -11,14 +11,14 @@ export async function createServerSupabaseClient() {
         getAll() {
           return cookieStore.getAll();
         },
-        // Explicitly type to avoid implicit any in strict mode
-        setAll(cookiesToSet: { name: string; value: string; options?: Parameters<typeof cookieStore.set>[2] }[]) {
+        // Loosely type cookiesToSet to satisfy strict TypeScript in middleware/SSR
+        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
             );
           } catch {
-            // If setting cookies fails, we silently ignore to avoid breaking responses.
+            // If setting cookies fails we ignore it so the response can still continue.
           }
         },
       },
