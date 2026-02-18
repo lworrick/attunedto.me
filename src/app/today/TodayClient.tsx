@@ -86,74 +86,79 @@ export function TodayClient(props: Props) {
   return (
     <div className="min-h-screen flex flex-col bg-attune-sand">
       <TopBar />
-      <div className="flex-1 overflow-y-auto px-4 pb-8 pt-4 max-w-md mx-auto w-full">
+      <div className="flex-1 overflow-y-auto px-4 pb-8 pt-4 w-full max-w-md lg:max-w-6xl mx-auto">
         <header className="mb-6">
           <h1 className="text-2xl font-bold text-attune-ink">Today</h1>
           <p className="text-sm text-attune-slate mt-0.5">{formatTodayDate()}</p>
         </header>
 
         <section className="mb-6">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
             {QUICK_LOGS.map(({ href, label, Icon, color }) => (
               <Link
                 key={href}
                 href={href}
-                className="rounded-2xl bg-white/90 border border-attune-stone shadow-sm flex flex-col items-center justify-center py-5 gap-2 tap-target hover:bg-attune-stone/20 transition"
+                className="rounded-2xl bg-white/90 border border-attune-stone shadow-sm flex flex-col items-center justify-center py-5 gap-2 tap-target hover:bg-attune-stone/20 transition min-h-[100px] overflow-visible"
               >
-                <Icon className={`w-8 h-8 shrink-0 ${color}`} />
+                <span className="flex items-center justify-center w-10 h-10 shrink-0 overflow-visible">
+                  <Icon className={`w-8 h-8 shrink-0 ${color}`} />
+                </span>
                 <span className="text-sm font-medium text-attune-ink">{label}</span>
               </Link>
             ))}
           </div>
         </section>
 
-        <section className="mb-6">
-          <div className="rounded-2xl bg-white/90 border border-attune-stone shadow-sm p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-              <h2 className="font-semibold text-attune-ink">Want personalized insights?</h2>
-              <p className="text-sm text-attune-slate mt-0.5">Generate AI insights from your last 14 days of tracking.</p>
-            </div>
-            <button
-              type="button"
-              onClick={handleGenerateInsights}
-              disabled={insightsLoading}
-              className="shrink-0 rounded-xl bg-attune-stone/80 hover:bg-attune-stone text-attune-ink font-medium py-2 px-4 flex items-center gap-2 tap-target disabled:opacity-60"
-            >
-              <IconSparkle className="w-4 h-4" />
-              {insightsLoading ? "Generating…" : "Generate"}
-            </button>
-          </div>
-        </section>
-
-        <section>
-          <div className="rounded-2xl bg-white/90 border border-attune-stone shadow-sm p-4">
-            {hasSnapshot ? (
-              <div className="text-sm space-y-2">
-                <h2 className="font-semibold text-attune-ink">Daily snapshot</h2>
-                {snapshot?.summary_text && <p className="whitespace-pre-line text-attune-ink">{snapshot.summary_text}</p>}
-                {snapshot?.suggestion && <p className="text-attune-slate">If you’d like to try: {snapshot.suggestion}</p>}
-                {snapshot?.supportive_line && <p className="text-attune-slate">{snapshot.supportive_line}</p>}
+        <div className="lg:grid lg:grid-cols-2 lg:gap-6 lg:mb-6">
+          <section className="mb-6 lg:mb-0">
+            <div className="rounded-2xl bg-white/90 border border-attune-stone shadow-sm p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 h-full">
+              <div>
+                <h2 className="font-semibold text-attune-ink">Want personalized insights?</h2>
+                <p className="text-sm text-attune-slate mt-0.5">Generate AI insights from your last 14 days of tracking.</p>
               </div>
-            ) : (
-              <>
-                <h2 className="font-semibold text-attune-ink">Welcome to a fresh day!</h2>
-                <p className="text-attune-slate mt-2 text-sm">
-                  Start by logging your first activity using the buttons above. Your daily summary will appear here as you track your wellness journey.
-                </p>
-                {snapshotError && <p className="text-attune-slate text-sm mt-2">{snapshotError}</p>}
-              </>
-            )}
-          </div>
-        </section>
+              <button
+                type="button"
+                onClick={handleGenerateInsights}
+                disabled={insightsLoading}
+                className="shrink-0 rounded-xl bg-attune-stone/80 hover:bg-attune-stone text-attune-ink font-medium py-2 px-4 flex items-center gap-2 tap-target disabled:opacity-60"
+              >
+                <IconSparkle className="w-4 h-4" />
+                {insightsLoading ? "Generating…" : "Generate"}
+              </button>
+            </div>
+          </section>
+          <section>
+            <div className="rounded-2xl bg-white/90 border border-attune-stone shadow-sm p-4 h-full">
+              {hasSnapshot ? (
+                <div className="text-sm space-y-2">
+                  <h2 className="font-semibold text-attune-ink">Daily snapshot</h2>
+                  {snapshot?.summary_text && <p className="whitespace-pre-line text-attune-ink">{snapshot.summary_text}</p>}
+                  {snapshot?.suggestion && <p className="text-attune-slate">If you’d like to try: {snapshot.suggestion}</p>}
+                  {snapshot?.supportive_line && <p className="text-attune-slate">{snapshot.supportive_line}</p>}
+                </div>
+              ) : (
+                <>
+                  <h2 className="font-semibold text-attune-ink">Welcome to a fresh day!</h2>
+                  <p className="text-attune-slate mt-2 text-sm">
+                    Start by logging your first activity using the buttons above. Your daily summary will appear here as you track your wellness journey.
+                  </p>
+                  {snapshotError && <p className="text-attune-slate text-sm mt-2">{snapshotError}</p>}
+                </>
+              )}
+            </div>
+          </section>
+        </div>
 
-        <section className="mt-6 space-y-3">
-          <h2 className="text-xs font-medium text-attune-slate uppercase tracking-wide">Today’s totals</h2>
-          <SummaryCard title="Estimated energy" value={props.nutrition ? `${props.nutrition.min}–${props.nutrition.max} kcal (approx.)` : "Not logged yet"} subtitle="Rough range only." />
-          <SummaryCard title="Protein & fiber" value={props.nutrition ? `${Math.round(props.nutrition.protein)} g protein · ${Math.round(props.nutrition.fiber)} g fiber` : "Not logged yet"} />
-          <SummaryCard title="Water" value={props.waterTotal ? `${props.waterTotal} oz` : "Not logged yet"} />
-          <SummaryCard title="Movement" value={props.movement ? `${props.movement.minutes} min · ~${props.movement.burnMin}–${props.movement.burnMax} kcal` : "Not logged yet"} />
-          <SummaryCard title="Cravings" value={props.cravingsCount ? `${props.cravingsCount} logged` : "Not logged yet"} />
-          <SummaryCard title="Sleep & stress" value={props.sleepAvg != null || props.stressAvg != null ? `Sleep ~${(props.sleepAvg ?? "–")}/5 · Stress ~${(props.stressAvg ?? "–")}/5` : "Not logged yet"} />
+        <section className="mt-6">
+          <h2 className="text-xs font-medium text-attune-slate uppercase tracking-wide mb-3">Today’s totals</h2>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <SummaryCard title="Estimated energy" value={props.nutrition ? `${props.nutrition.min}–${props.nutrition.max} kcal (approx.)` : "Not logged yet"} subtitle="Rough range only." />
+            <SummaryCard title="Protein & fiber" value={props.nutrition ? `${Math.round(props.nutrition.protein)} g protein · ${Math.round(props.nutrition.fiber)} g fiber` : "Not logged yet"} />
+            <SummaryCard title="Water" value={props.waterTotal ? `${props.waterTotal} oz` : "Not logged yet"} />
+            <SummaryCard title="Movement" value={props.movement ? `${props.movement.minutes} min · ~${props.movement.burnMin}–${props.movement.burnMax} kcal` : "Not logged yet"} />
+            <SummaryCard title="Cravings" value={props.cravingsCount ? `${props.cravingsCount} logged` : "Not logged yet"} />
+            <SummaryCard title="Sleep & stress" value={props.sleepAvg != null || props.stressAvg != null ? `Sleep ~${(props.sleepAvg ?? "–")}/5 · Stress ~${(props.stressAvg ?? "–")}/5` : "Not logged yet"} />
+          </div>
         </section>
       </div>
     </div>

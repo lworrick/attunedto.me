@@ -43,10 +43,11 @@ export function IconFood({ className = "w-6 h-6" }: { className?: string }) {
   );
 }
 
+/** Water droplet — teardrop shape, fully inside viewBox so it never clips */
 export function IconWater({ className = "w-6 h-6" }: { className?: string }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v.75m0 0v.75m0-2.25h.75m-.75 0H12m-3 0H9.75m9 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3 Q8 12 12 21 Q16 12 12 3" />
     </svg>
   );
 }

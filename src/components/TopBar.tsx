@@ -14,7 +14,8 @@ const items = [
 export function TopBar() {
   const pathname = usePathname();
   return (
-    <header className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-attune-sand border-b border-attune-stone">
+    <header className="sticky top-0 z-10 flex items-center justify-center px-4 py-3 bg-attune-sand border-b border-attune-stone">
+      <div className="w-full max-w-md lg:max-w-6xl flex items-center justify-between">
       <Link href="/today" className="text-lg font-semibold text-attune-ink">
         Attune
       </Link>
@@ -36,6 +37,7 @@ export function TopBar() {
           );
         })}
       </nav>
+      </div>
     </header>
   );
 }
