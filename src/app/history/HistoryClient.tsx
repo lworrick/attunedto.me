@@ -26,13 +26,13 @@ export function HistoryClient() {
     });
   }, [tab, supabase]);
 
-  const grouped = rows.reduce((acc, row) => {
+  const grouped = rows.reduce<Record<string, Record<string, unknown>[]>>((acc, row) => {
     const ts = (row.timestamp as string) ?? "";
     const key = new Date(ts).toDateString();
     if (!acc[key]) acc[key] = [];
     acc[key].push(row);
     return acc;
-  }, {} as Record<string, Record<string, unknown>[]>);
+  }, {});
 
   function getLabel(row: Record<string, unknown>): string {
     if (tab === "food") return (row.text as string) ?? "";
