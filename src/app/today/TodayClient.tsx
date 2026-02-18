@@ -49,11 +49,14 @@ export function TodayClient(props: Props) {
   const [snapshotError, setSnapshotError] = useState<string | null>(null);
   const [insightsLoading, setInsightsLoading] = useState(false);
   const [liveData, setLiveData] = useState<Props | null>(null);
+  const [foodLogsCount, setFoodLogsCount] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const supabase = createClient();
 
   const display = liveData ?? props;
 
   const refetchToday = () => {
+    setRefreshing(true);
     const today = new Date().toISOString().slice(0, 10);
     const todayEnd = today + "T23:59:59.999Z";
     Promise.all([
@@ -89,6 +92,7 @@ export function TodayClient(props: Props) {
       const stress = stressRes.data ?? [];
       const sleepAvg = sleep.length ? sleep.reduce((s, r) => s + r.sleep_quality, 0) / sleep.length : null;
       const stressAvg = stress.length ? stress.reduce((s, r) => s + r.stress_level, 0) / stress.length : null;
+      setFoodLogsCount(food.length);
       setLiveData({
         nutrition,
         waterTotal,
@@ -98,7 +102,8 @@ export function TodayClient(props: Props) {
         sleepAvg,
         stressAvg,
       });
-    });
+    })
+    .finally(() => setRefreshing(false));
   };
 
   useEffect(() => {
@@ -155,9 +160,14 @@ export function TodayClient(props: Props) {
       <TopBar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 md:pb-8">
         <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl text-[var(--basalt)] font-canela">Today</h1>
-            <p className="text-[var(--dust)] mt-1">{formatTodayDate()}</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h1 className="text-3xl text-[var(--basalt)] font-canela">Today</h1>
+              <p className="text-[var(--dust)] mt-1">{formatTodayDate()}</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => refetchToday()} disabled={refreshing}>
+              {refreshing ? "Refreshing…" : "Refresh"}
+            </Button>
           </div>
 
           {/* Quick Actions - Figma style */}
@@ -253,6 +263,11 @@ export function TodayClient(props: Props) {
                     <p className="font-medium text-[var(--basalt)]">{display.nutrition ? Math.round(display.nutrition.fiber) : 0}g</p>
                   </div>
                 </div>
+                {foodLogsCount != null && foodLogsCount > 0 && display.nutrition && display.nutrition.min === 0 && (
+                  <p className="text-xs text-[var(--dust)] pt-1">
+                    If you just logged food, estimates can take a minute. Tap Refresh above to update.
+                  </p>
+                )}
               </CardContent>
             </Card>
             <Card>

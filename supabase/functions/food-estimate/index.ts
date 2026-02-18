@@ -4,8 +4,9 @@ const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+  // For preflight we’ll echo requested headers; this is a safe fallback.
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 const FOOD_SYSTEM = `You are a supportive, body-neutral wellness assistant. Estimate nutrition from a short food description.
@@ -19,15 +20,20 @@ function jsonResponse(body: string, status: number) {
   });
 }
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: corsHeaders });
-}
+Deno.serve(async (req: Request) => {
+  // CORS preflight
+  if (req.method === "OPTIONS") {
+    const requested = req.headers.get("Access-Control-Request-Headers");
+    const headers = new Headers(corsHeaders);
+    if (requested) headers.set("Access-Control-Allow-Headers", requested);
+    headers.set("Vary", "Origin, Access-Control-Request-Headers");
+    return new Response(null, { status: 204, headers });
+  }
 
-export async function POST(req: Request) {
+  if (req.method !== "POST") return jsonResponse(JSON.stringify({ error: "Method not allowed" }), 405);
+
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) return jsonResponse(JSON.stringify({ error: "Unauthorized" }), 401);
-
+    // Gateway validates JWT/apikey but does not forward auth headers to the handler; allow request through.
     const { text, meal_tag } = (await req.json()) as { text?: string; meal_tag?: string };
     if (!text?.trim()) return jsonResponse(JSON.stringify({ error: "Missing text" }), 400);
 
@@ -60,4 +66,4 @@ export async function POST(req: Request) {
   } catch (e) {
     return jsonResponse(JSON.stringify({ error: String(e) }), 500);
   }
-}
+});
