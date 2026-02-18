@@ -135,8 +135,6 @@ export function TrendsClient() {
                         border: "1px solid var(--dust)",
                         borderRadius: 8,
                       }}
-                      formatter={(value: number) => [value, "cal"]}
-                      labelFormatter={(_, payload) => payload?.[0]?.payload?.label}
                     />
                     <Area
                       type="monotone"
@@ -145,6 +143,7 @@ export function TrendsClient() {
                       fill="var(--clay)"
                       fillOpacity={0.2}
                       strokeWidth={2}
+                      name="cal (mid-point)"
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -171,11 +170,9 @@ export function TrendsClient() {
                           border: "1px solid var(--dust)",
                           borderRadius: 8,
                         }}
-                        formatter={(value: number, name: string) => [value, name === "protein" ? "protein (g)" : "fiber (g)"]}
-                        labelFormatter={(_, payload) => payload?.[0]?.payload?.label}
                       />
-                      <Line type="monotone" dataKey="protein" stroke="var(--clay)" strokeWidth={2} dot={{ r: 3 }} name="protein" />
-                      <Line type="monotone" dataKey="fiber" stroke="var(--sage)" strokeWidth={2} dot={{ r: 3 }} name="fiber" />
+                      <Line type="monotone" dataKey="protein" stroke="var(--clay)" strokeWidth={2} dot={{ r: 3 }} name="protein (g)" />
+                      <Line type="monotone" dataKey="fiber" stroke="var(--sage)" strokeWidth={2} dot={{ r: 3 }} name="fiber (g)" />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -199,10 +196,8 @@ export function TrendsClient() {
                           border: "1px solid var(--dust)",
                           borderRadius: 8,
                         }}
-                        formatter={(value: number) => [value, "oz"]}
-                        labelFormatter={(_, payload) => payload?.[0]?.payload?.label}
                       />
-                      <Bar dataKey="water" fill="var(--sage)" radius={[4, 4, 0, 0]} name="water" />
+                      <Bar dataKey="water" fill="var(--sage)" radius={[4, 4, 0, 0]} name="water (oz)" />
                     </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
