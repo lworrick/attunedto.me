@@ -64,8 +64,14 @@ export default function LogFoodPage() {
             body: { text: textToSave, meal_tag: mealTagToSave ?? undefined },
           })
           .then(({ data, error: aiErr }) => {
-            if (aiErr || !data || (typeof data === "object" && "error" in data))
+            if (aiErr) {
+              console.error("[food-estimate] function error:", aiErr.message, aiErr);
               return;
+            }
+            if (!data || (typeof data === "object" && "error" in data)) {
+              console.warn("[food-estimate] no data or error in response:", data);
+              return;
+            }
             const d = data as Record<string, unknown>;
             const num = (v: unknown) => (typeof v === "number" && !Number.isNaN(v) ? v : typeof v === "string" ? Number(v) : null);
             supabase
@@ -82,9 +88,10 @@ export default function LogFoodPage() {
               })
               .eq("id", rowId)
               .then(({ error: updateErr }) => {
-                if (updateErr) console.warn("Background estimate update failed:", updateErr.message);
+                if (updateErr) console.error("[food-estimate] DB update failed:", updateErr.message);
               });
-          });
+          })
+          .catch((err) => console.error("[food-estimate] invoke failed:", err));
       }
     } catch {
       setSaving(false);
@@ -130,7 +137,12 @@ export default function LogFoodPage() {
           </Button>
         </form>
         {error && <p className="mt-3 text-sm text-[var(--adobe)]">{error}</p>}
-        {message && <p className="mt-3 text-sm text-[var(--dust)] bg-[var(--bone)] border border-[var(--dust)] rounded-lg px-3 py-2">{message}</p>}
+        {message && (
+          <p className="mt-3 text-sm text-[var(--dust)] bg-[var(--bone)] border border-[var(--dust)] rounded-lg px-3 py-2">
+            {message}
+            <span className="block mt-1 text-xs opacity-90">Numbers usually appear on Today within a minute; tap Refresh there if not.</span>
+          </p>
+        )}
       </div>
     </div>
   );
