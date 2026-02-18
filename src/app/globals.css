@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --attune-sand: #f5f0e8;
+  --attune-stone: #e8e2d9;
+  --attune-sage: #9caa8f;
+  --attune-sage-light: #c5d4b9;
+  --attune-clay: #c4a77d;
+  --attune-clay-light: #e5d4bc;
+  --attune-slate: #5c6b73;
+  --attune-ink: #2d3436;
+  --attune-mist: #a8b4b8;
+}
+
+body {
+  @apply bg-attune-sand text-attune-ink antialiased;
+  min-height: 100dvh;
+}
+
+/* Calming focus states */
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-attune-sage;
+}
+
+/* Soft tap targets on mobile */
+@media (pointer: coarse) {
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
