@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { MainNav } from "@/components/MainNav";
+import { TopBar } from "@/components/TopBar";
 
 const LEVEL_LABELS: Record<number, string> = { 1: "Very calm", 2: "Mostly calm", 3: "Moderate", 4: "High", 5: "Very high" };
 
@@ -29,7 +29,8 @@ export default function LogStressPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-attune-sand">
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-4 max-w-md mx-auto">
+      <TopBar />
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 max-w-md mx-auto">
         <Link href="/today" className="text-sm text-attune-slate mb-4 inline-block">← Today</Link>
         <h1 className="text-xl font-semibold text-attune-ink mb-1">Log stress</h1>
         <p className="text-sm text-attune-slate mb-6">Where’s your stress level right now? Just a snapshot.</p>
@@ -50,7 +51,6 @@ export default function LogStressPage() {
         </form>
         {message && <p className="mt-4 text-sm text-attune-slate bg-white/70 border border-attune-stone rounded-lg px-3 py-2">{message}</p>}
       </div>
-      <MainNav />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { MainNav } from "@/components/MainNav";
+import { TopBar } from "@/components/TopBar";
 
 const CATEGORIES = ["sweet", "salty", "crunchy", "creamy", "comforting", "quick energy"];
 
@@ -51,7 +51,8 @@ export default function LogCravingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-attune-sand">
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-4 max-w-md mx-auto">
+      <TopBar />
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 max-w-md mx-auto">
         <Link href="/today" className="text-sm text-attune-slate mb-4 inline-block">← Today</Link>
         <h1 className="text-xl font-semibold text-attune-ink mb-1">Log craving</h1>
         <p className="text-sm text-attune-slate mb-4">No judgment. Sometimes a gentle alternative helps; sometimes honoring it does.</p>
@@ -103,7 +104,6 @@ export default function LogCravingPage() {
           </div>
         )}
       </div>
-      <MainNav />
     </div>
   );
 }

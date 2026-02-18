@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { MainNav } from "@/components/MainNav";
+import { TopBar } from "@/components/TopBar";
 
 type Props = {
   userId: string;
@@ -29,7 +29,8 @@ export function SettingsClient({ userId, initialPrefs }: Props) {
 
   return (
     <div className="min-h-screen flex flex-col bg-attune-sand">
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-4 max-w-md mx-auto">
+      <TopBar />
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 max-w-md mx-auto">
         <h1 className="text-xl font-semibold text-attune-ink mb-1">Settings</h1>
         <p className="text-sm text-attune-slate mb-6">Preferences that shape how Attune talks to you.</p>
 
@@ -54,7 +55,6 @@ export function SettingsClient({ userId, initialPrefs }: Props) {
 
         <p className="mt-6 text-xs text-attune-slate">Insights use these when we can. Regenerate from the Trends page for fresh wording.</p>
       </div>
-      <MainNav />
     </div>
   );
 }

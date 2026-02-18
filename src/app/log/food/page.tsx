@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { MainNav } from "@/components/MainNav";
+import { TopBar } from "@/components/TopBar";
 
 const MEAL_TAGS = ["Breakfast", "Lunch", "Dinner", "Snack"];
 
@@ -68,7 +68,8 @@ export default function LogFoodPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-attune-sand">
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-4 max-w-md mx-auto">
+      <TopBar />
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 max-w-md mx-auto">
         <Link href="/today" className="text-sm text-attune-slate mb-4 inline-block">← Today</Link>
         <h1 className="text-xl font-semibold text-attune-ink mb-1">Log food</h1>
         <p className="text-sm text-attune-slate mb-4">Short descriptions are fine. Portions can be approximate.</p>
@@ -103,7 +104,6 @@ export default function LogFoodPage() {
         {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
         {message && <p className="mt-3 text-sm text-attune-slate bg-white/70 border border-attune-stone rounded-lg px-3 py-2">{message}</p>}
       </div>
-      <MainNav />
     </div>
   );
 }

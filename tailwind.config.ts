@@ -7,7 +7,7 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   safelist: [
-    { pattern: /^(bg|text|border|outline|ring)-attune-(sand|stone|sage|sageLight|clay|clayLight|slate|ink|mist)(\/[0-9]+)?$/ },
+    { pattern: /^(bg|text|border|outline|ring)-attune-(sand|stone|sage|sageLight|clay|clayLight|slate|ink|mist|iconFood|iconWater|iconCraving|iconMovement|iconSleep|iconStress)(\/[0-9]+)?$/ },
   ],
   theme: {
     extend: {
@@ -22,6 +22,12 @@ const config: Config = {
           slate: "#5c6b73",
           ink: "#2d3436",
           mist: "#a8b4b8",
+          iconFood: "#c17f59",
+          iconWater: "#6b9b8a",
+          iconCraving: "#c99090",
+          iconMovement: "#8a8f8a",
+          iconSleep: "#b8a078",
+          iconStress: "#a67c6b",
         },
       },
       fontFamily: {

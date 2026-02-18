@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { MainNav } from "@/components/MainNav";
+import { TopBar } from "@/components/TopBar";
 
 const QUALITY_LABELS: Record<number, string> = { 1: "Very poor", 2: "Poor", 3: "Okay", 4: "Good", 5: "Excellent" };
 
@@ -33,7 +33,8 @@ export default function LogSleepPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-attune-sand">
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-4 max-w-md mx-auto">
+      <TopBar />
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 max-w-md mx-auto">
         <Link href="/today" className="text-sm text-attune-slate mb-4 inline-block">← Today</Link>
         <h1 className="text-xl font-semibold text-attune-ink mb-1">Log sleep</h1>
         <p className="text-sm text-attune-slate mb-6">How did sleep feel? No judgment.</p>
@@ -58,7 +59,6 @@ export default function LogSleepPage() {
         </form>
         {message && <p className="mt-4 text-sm text-attune-slate bg-white/70 border border-attune-stone rounded-lg px-3 py-2">{message}</p>}
       </div>
-      <MainNav />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { MainNav } from "@/components/MainNav";
+import { TopBar } from "@/components/TopBar";
 
 type Tab = "food" | "water" | "cravings" | "movement" | "sleep" | "stress";
 
@@ -59,7 +59,8 @@ export function HistoryClient() {
 
   return (
     <div className="min-h-screen flex flex-col bg-attune-sand">
-      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-4 max-w-md mx-auto">
+      <TopBar />
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 max-w-md mx-auto">
         <h1 className="text-xl font-semibold text-attune-ink mb-1">History</h1>
         <p className="text-sm text-attune-slate mb-4">A gentle look back at what you’ve logged.</p>
 
@@ -90,7 +91,6 @@ export function HistoryClient() {
             </section>
           ))}
       </div>
-      <MainNav />
     </div>
   );
 }
