@@ -66,30 +66,24 @@ export default function LogFoodPage() {
           .then(({ data, error: aiErr }) => {
             if (aiErr || !data || (typeof data === "object" && "error" in data))
               return;
-            const d = data as {
-              calories_min?: number;
-              calories_max?: number;
-              protein_g?: number;
-              carbs_g?: number;
-              fat_g?: number;
-              fiber_g?: number;
-              confidence?: string;
-              supportive_note?: string | null;
-            };
+            const d = data as Record<string, unknown>;
+            const num = (v: unknown) => (typeof v === "number" && !Number.isNaN(v) ? v : typeof v === "string" ? Number(v) : null);
             supabase
               .from("food_logs")
               .update({
-                calories_min: d.calories_min ?? null,
-                calories_max: d.calories_max ?? null,
-                protein_g: d.protein_g ?? null,
-                carbs_g: d.carbs_g ?? null,
-                fat_g: d.fat_g ?? null,
-                fiber_g: d.fiber_g ?? null,
-                confidence: d.confidence ?? null,
-                supportive_note: d.supportive_note ?? null,
+                calories_min: num(d.calories_min) ?? null,
+                calories_max: num(d.calories_max) ?? null,
+                protein_g: num(d.protein_g) ?? null,
+                carbs_g: num(d.carbs_g) ?? null,
+                fat_g: num(d.fat_g) ?? null,
+                fiber_g: num(d.fiber_g) ?? null,
+                confidence: typeof d.confidence === "string" ? d.confidence : null,
+                supportive_note: typeof d.supportive_note === "string" ? d.supportive_note : null,
               })
               .eq("id", rowId)
-              .then(() => {});
+              .then(({ error: updateErr }) => {
+                if (updateErr) console.warn("Background estimate update failed:", updateErr.message);
+              });
           });
       }
     } catch {
