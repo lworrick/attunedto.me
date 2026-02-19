@@ -137,9 +137,12 @@ export function TodayClient(props: Props) {
       sleep_quality_avg: display.sleepAvg ?? undefined,
       stress_level_avg: display.stressAvg ?? undefined,
     };
-    fetch("/api/daily-summary", {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return;
+    fetch(`${url}/functions/v1/daily-summary`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify(body),
     })
       .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
@@ -164,9 +167,15 @@ export function TodayClient(props: Props) {
       sleep_quality_avg: display.sleepAvg ?? undefined,
       stress_level_avg: display.stressAvg ?? undefined,
     };
-    fetch("/api/daily-summary", {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) {
+      setInsightsLoading(false);
+      return;
+    }
+    fetch(`${url}/functions/v1/daily-summary`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify(body),
     })
       .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
