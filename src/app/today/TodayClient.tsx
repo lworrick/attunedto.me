@@ -137,27 +137,54 @@ export function TodayClient(props: Props) {
       sleep_quality_avg: display.sleepAvg ?? undefined,
       stress_level_avg: display.stressAvg ?? undefined,
     };
-    supabase.functions.invoke("daily-summary", { body }).then(({ data, error }) => {
-      if (error) setSnapshotError("Snapshot is taking a short break.");
-      else if (data) setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
-    });
-  }, [display.nutrition, display.waterTotal, display.movement, display.cravingsCount, display.cravingsAvgIntensity, display.sleepAvg, display.stressAvg, supabase]);
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return;
+    fetch(`${url}/functions/v1/daily-summary`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify(body),
+    })
+      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok) setSnapshotError("Snapshot is taking a short break.");
+        else if (data && !(typeof data === "object" && "error" in data)) setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
+      })
+      .catch(() => setSnapshotError("Snapshot is taking a short break."));
+  }, [display.nutrition, display.waterTotal, display.movement, display.cravingsCount, display.cravingsAvgIntensity, display.sleepAvg, display.stressAvg]);
 
   function handleGenerateInsights() {
     setInsightsLoading(true);
-    supabase.functions.invoke("daily-summary", {
-      body: {
-        nutrition: display.nutrition ? { calories_min: display.nutrition.min, calories_max: display.nutrition.max, protein: display.nutrition.protein, fiber: display.nutrition.fiber } : null,
-        water: display.waterTotal || undefined,
-        cravings: display.cravingsCount ? { count: display.cravingsCount, avg_intensity: display.cravingsAvgIntensity } : null,
-        movement: display.movement ? { minutes: display.movement.minutes, burn_min: display.movement.burnMin, burn_max: display.movement.burnMax } : null,
-        sleep_quality_avg: display.sleepAvg ?? undefined,
-        stress_level_avg: display.stressAvg ?? undefined,
-      },
-    }).then(({ data, error }) => {
+    setSnapshotError(null);
+    const body = {
+      nutrition: display.nutrition ? { calories_min: display.nutrition.min, calories_max: display.nutrition.max, protein: display.nutrition.protein, fiber: display.nutrition.fiber } : null,
+      water: display.waterTotal || undefined,
+      cravings: display.cravingsCount ? { count: display.cravingsCount, avg_intensity: display.cravingsAvgIntensity } : null,
+      movement: display.movement ? { minutes: display.movement.minutes, burn_min: display.movement.burnMin, burn_max: display.movement.burnMax } : null,
+      sleep_quality_avg: display.sleepAvg ?? undefined,
+      stress_level_avg: display.stressAvg ?? undefined,
+    };
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) {
       setInsightsLoading(false);
-      if (!error && data) setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
-    });
+      return;
+    }
+    fetch(`${url}/functions/v1/daily-summary`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify(body),
+    })
+      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        setInsightsLoading(false);
+        if (ok && data && !(typeof data === "object" && "error" in data)) setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
+        else if (!ok) setSnapshotError("Snapshot is taking a short break.");
+      })
+      .catch(() => {
+        setInsightsLoading(false);
+        setSnapshotError("Snapshot is taking a short break.");
+      });
   }
 
   const hasSnapshot = snapshot?.summary_text || snapshot?.suggestion || snapshot?.supportive_line;
