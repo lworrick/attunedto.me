@@ -11,7 +11,7 @@ export default async function TodayPage() {
   const todayEnd = today + "T23:59:59.999Z";
 
   const [foodRes, waterRes, moveRes, cravingRes, sleepRes, stressRes] = await Promise.all([
-    supabase.from("food_logs").select("calories_min, calories_max, protein_g, fiber_g").gte("timestamp", today).lt("timestamp", todayEnd),
+    supabase.from("food_logs").select("calories_min, calories_max, protein_g, carbs_g, fat_g, fiber_g, sugar_g").gte("timestamp", today).lt("timestamp", todayEnd),
     supabase.from("water_logs").select("ounces").gte("timestamp", today).lt("timestamp", todayEnd),
     supabase.from("movement_logs").select("duration_min, estimated_burn_min, estimated_burn_max").gte("timestamp", today).lt("timestamp", todayEnd),
     supabase.from("craving_logs").select("intensity").gte("timestamp", today).lt("timestamp", todayEnd),
@@ -24,7 +24,10 @@ export default async function TodayPage() {
         min: foodRes.data.reduce((s, r) => s + (r.calories_min ?? 0), 0),
         max: foodRes.data.reduce((s, r) => s + (r.calories_max ?? 0), 0),
         protein: foodRes.data.reduce((s, r) => s + (r.protein_g ?? 0), 0),
+        carbs: foodRes.data.reduce((s, r) => s + (r.carbs_g ?? 0), 0),
+        fat: foodRes.data.reduce((s, r) => s + (r.fat_g ?? 0), 0),
         fiber: foodRes.data.reduce((s, r) => s + (r.fiber_g ?? 0), 0),
+        sugar: foodRes.data.reduce((s, r) => s + ((r as { sugar_g?: number }).sugar_g ?? 0), 0),
       }
     : null;
   const waterTotal = waterRes.data?.reduce((s, r) => s + Number(r.ounces), 0) ?? 0;

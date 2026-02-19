@@ -40,6 +40,7 @@ export default function LogFoodPage() {
           carbs_g: null,
           fat_g: null,
           fiber_g: null,
+          sugar_g: null,
           confidence: null,
           supportive_note: null,
         })
@@ -86,6 +87,7 @@ export default function LogFoodPage() {
             const carbsG = num(get("carbs_g", "carbsG"));
             const fatG = num(get("fat_g", "fatG"));
             const fiberG = num(get("fiber_g", "fiberG"));
+            const sugarG = num(get("sugar_g", "sugarG"));
             const confVal = get("confidence", "confidence");
             const noteVal = get("supportive_note", "supportiveNote");
             const confidence = typeof confVal === "string" ? confVal : null;
@@ -99,6 +101,7 @@ export default function LogFoodPage() {
                 carbs_g: carbsG ?? null,
                 fat_g: fatG ?? null,
                 fiber_g: fiberG ?? null,
+                sugar_g: sugarG ?? null,
                 confidence,
                 supportive_note: supportiveNote,
               })

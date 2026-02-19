@@ -17,7 +17,7 @@ import {
 } from "@/components/icons";
 
 type Props = {
-  nutrition: { min: number; max: number; protein: number; fiber: number } | null;
+  nutrition: { min: number; max: number; protein: number; carbs: number; fat: number; fiber: number; sugar: number } | null;
   waterTotal: number;
   movement: { minutes: number; burnMin: number; burnMax: number } | null;
   cravingsCount: number;
@@ -60,7 +60,7 @@ export function TodayClient(props: Props) {
     const today = new Date().toISOString().slice(0, 10);
     const todayEnd = today + "T23:59:59.999Z";
     Promise.all([
-      supabase.from("food_logs").select("calories_min, calories_max, protein_g, fiber_g").gte("timestamp", today).lt("timestamp", todayEnd),
+      supabase.from("food_logs").select("calories_min, calories_max, protein_g, carbs_g, fat_g, fiber_g, sugar_g").gte("timestamp", today).lt("timestamp", todayEnd),
       supabase.from("water_logs").select("ounces").gte("timestamp", today).lt("timestamp", todayEnd),
       supabase.from("movement_logs").select("duration_min, estimated_burn_min, estimated_burn_max").gte("timestamp", today).lt("timestamp", todayEnd),
       supabase.from("craving_logs").select("intensity").gte("timestamp", today).lt("timestamp", todayEnd),
@@ -73,7 +73,10 @@ export function TodayClient(props: Props) {
             min: food.reduce((s, r) => s + (r.calories_min ?? 0), 0),
             max: food.reduce((s, r) => s + (r.calories_max ?? 0), 0),
             protein: food.reduce((s, r) => s + (r.protein_g ?? 0), 0),
+            carbs: food.reduce((s, r) => s + (r.carbs_g ?? 0), 0),
+            fat: food.reduce((s, r) => s + (r.fat_g ?? 0), 0),
             fiber: food.reduce((s, r) => s + (r.fiber_g ?? 0), 0),
+            sugar: food.reduce((s, r) => s + ((r as { sugar_g?: number }).sugar_g ?? 0), 0),
           }
         : null;
       const waterTotal = (waterRes.data ?? []).reduce((s, r) => s + Number(r.ounces), 0);
@@ -253,14 +256,26 @@ export function TodayClient(props: Props) {
                       : "—"}
                   </p>
                 </div>
-                <div className="flex gap-4 text-sm">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 text-sm">
                   <div>
                     <p className="text-xs text-[var(--dust)]">Protein</p>
                     <p className="font-medium text-[var(--basalt)]">{display.nutrition ? Math.round(display.nutrition.protein) : 0}g</p>
                   </div>
                   <div>
+                    <p className="text-xs text-[var(--dust)]">Carbs</p>
+                    <p className="font-medium text-[var(--basalt)]">{display.nutrition ? Math.round(display.nutrition.carbs) : 0}g</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[var(--dust)]">Fat</p>
+                    <p className="font-medium text-[var(--basalt)]">{display.nutrition ? Math.round(display.nutrition.fat) : 0}g</p>
+                  </div>
+                  <div>
                     <p className="text-xs text-[var(--dust)]">Fiber</p>
                     <p className="font-medium text-[var(--basalt)]">{display.nutrition ? Math.round(display.nutrition.fiber) : 0}g</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[var(--dust)]">Sugar</p>
+                    <p className="font-medium text-[var(--basalt)]">{display.nutrition ? Math.round(display.nutrition.sugar) : 0}g</p>
                   </div>
                 </div>
                 {foodLogsCount != null && foodLogsCount > 0 && display.nutrition && display.nutrition.min === 0 && (
