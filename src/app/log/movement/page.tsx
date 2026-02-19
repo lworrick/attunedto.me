@@ -27,31 +27,65 @@ export default function LogMovementPage() {
     setError(null);
     setMessage(null);
 
-    const { data, error: aiErr } = await supabase.functions.invoke("movement-estimate", { body: { text } });
-    if (aiErr || !data) {
-      setError("Estimate is taking a pause. You can still log the activity.");
-      setLoading(false);
-      return;
-    }
-    const d = data as { activity_type?: string; duration_min?: number; estimated_burn_min?: number; estimated_burn_max?: number; supportive_note?: string };
-    const { error: insertErr } = await supabase.from("movement_logs").insert({
-      raw_text: text,
-      activity_type: d.activity_type ?? typeTag,
-      duration_min: d.duration_min ?? null,
-      intensity: intensity,
-      estimated_burn_min: d.estimated_burn_min ?? null,
-      estimated_burn_max: d.estimated_burn_max ?? null,
-      supportive_note: d.supportive_note ?? null,
-    });
+    const textToSave = text;
+    const typeTagToSave = typeTag;
+    const intensityToSave = intensity;
+
+    const { data: inserted, error: insertErr } = await supabase
+      .from("movement_logs")
+      .insert({
+        raw_text: textToSave,
+        activity_type: typeTagToSave,
+        duration_min: null,
+        intensity: intensityToSave,
+        estimated_burn_min: null,
+        estimated_burn_max: null,
+        supportive_note: null,
+      })
+      .select("id")
+      .single();
+
     setLoading(false);
     if (insertErr) {
       setError("Log didn’t save. Try again in a moment.");
       return;
     }
-    setMessage(d.supportive_note ?? "Thanks for logging. Data, not drama.");
+
+    setMessage("Thanks for logging. Estimating duration and burn in the background…");
     setText("");
     setTypeTag(null);
     setIntensity(null);
+
+    const rowId = inserted?.id;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (rowId && supabaseUrl && anonKey) {
+      fetch(`${supabaseUrl}/functions/v1/movement-estimate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${anonKey}` },
+        body: JSON.stringify({ text: textToSave }),
+      })
+        .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
+        .then(({ ok, data }) => {
+          if (!ok || !data || (typeof data === "object" && "error" in data)) return;
+          const d = data as { activity_type?: string; duration_min?: number; estimated_burn_min?: number; estimated_burn_max?: number; supportive_note?: string };
+          const num = (v: unknown) => (typeof v === "number" && !Number.isNaN(v) ? v : null);
+          supabase
+            .from("movement_logs")
+            .update({
+              activity_type: d.activity_type ?? typeTagToSave ?? null,
+              duration_min: num(d.duration_min) ?? null,
+              estimated_burn_min: num(d.estimated_burn_min) ?? null,
+              estimated_burn_max: num(d.estimated_burn_max) ?? null,
+              supportive_note: typeof d.supportive_note === "string" ? d.supportive_note : null,
+            })
+            .eq("id", rowId)
+            .then(({ error: updateErr }) => {
+              if (updateErr) console.warn("[movement-estimate] update failed:", updateErr.message);
+            });
+        })
+        .catch((err) => console.warn("[movement-estimate] invoke failed:", err));
+    }
   }
 
   return (
@@ -94,7 +128,12 @@ export default function LogMovementPage() {
           </Button>
         </form>
         {error && <p className="mt-3 text-sm text-[var(--adobe)]">{error}</p>}
-        {message && <p className="mt-3 text-sm text-[var(--dust)] bg-[var(--bone)] border border-[var(--dust)] rounded-lg px-3 py-2">{message}</p>}
+        {message && (
+          <p className="mt-3 text-sm text-[var(--dust)] bg-[var(--bone)] border border-[var(--dust)] rounded-lg px-3 py-2">
+            {message}
+            <span className="block mt-1 text-xs opacity-90">Duration and burn usually show on Today within a minute; tap Refresh there if not.</span>
+          </p>
+        )}
       </div>
     </div>
   );

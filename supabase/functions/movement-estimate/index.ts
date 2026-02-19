@@ -2,20 +2,30 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
 const MOVEMENT_SYSTEM = `You are a supportive, body-neutral wellness assistant. Parse a short movement description into structured data.
 Rules: Be gentle and neutral. Estimate duration in minutes and calorie burn as a RANGE (estimated_burn_min, estimated_burn_max). Never shame or pressure.
 Return ONLY valid JSON with: activity_type (string, e.g. "walk", "strength"), duration_min (number), estimated_burn_min (number), estimated_burn_max (number), supportive_note (1 short supportive sentence).`;
 
-export async function POST(req: Request) {
-  try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+function jsonResponse(body: string, status: number) {
+  return new Response(body, { status, headers: { "Content-Type": "application/json", ...corsHeaders } });
+}
 
+Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
+  if (req.method !== "POST") return jsonResponse(JSON.stringify({ error: "Method not allowed" }), 405);
+
+  try {
     const { text } = (await req.json()) as { text?: string };
-    if (!text?.trim()) return new Response(JSON.stringify({ error: "Missing text" }), { status: 400 });
+    if (!text?.trim()) return jsonResponse(JSON.stringify({ error: "Missing text" }), 400);
 
     const apiKey = Deno.env.get("OPENAI_API_KEY");
-    if (!apiKey) return new Response(JSON.stringify({ error: "Server config error" }), { status: 500 });
+    if (!apiKey) return jsonResponse(JSON.stringify({ error: "Server config error" }), 500);
 
     const res = await fetch(OPENAI_URL, {
       method: "POST",
@@ -32,14 +42,14 @@ export async function POST(req: Request) {
     });
     if (!res.ok) {
       const err = await res.text();
-      return new Response(JSON.stringify({ error: "AI request failed", details: err }), { status: 502 });
+      return jsonResponse(JSON.stringify({ error: "AI request failed", details: err }), 502);
     }
     const data = await res.json();
     const content = data.choices?.[0]?.message?.content;
-    if (!content) return new Response(JSON.stringify({ error: "Invalid AI response" }), { status: 502 });
+    if (!content) return jsonResponse(JSON.stringify({ error: "Invalid AI response" }), 502);
     const parsed = JSON.parse(content);
-    return new Response(JSON.stringify(parsed), { headers: { "Content-Type": "application/json" } });
+    return jsonResponse(JSON.stringify(parsed), 200);
   } catch (e) {
-    return new Response(JSON.stringify({ error: String(e) }), { status: 500 });
+    return jsonResponse(JSON.stringify({ error: String(e) }), 500);
   }
-}
+});
