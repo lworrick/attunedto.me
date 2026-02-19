@@ -146,7 +146,7 @@ export default function AuthPage() {
                 <button
                   type="button"
                   onClick={() => setMode(mode === "magicLink" ? "signIn" : "magicLink")}
-                  className="text-sm text-[var(--clay)] hover:underline"
+                  className="text-sm text-[var(--dust)] hover:text-[var(--basalt)] hover:underline"
                 >
                   {mode === "magicLink" ? "Use password instead" : "Prefer a magic link? Email me a sign-in link"}
                 </button>
@@ -154,7 +154,7 @@ export default function AuthPage() {
                   <button
                     type="button"
                     onClick={() => setMode(mode === "signUp" ? "signIn" : "signUp")}
-                    className="block w-full text-center text-sm text-[var(--dust)] hover:text-[var(--basalt)]"
+                    className="block w-full text-center text-sm text-[var(--clay)] hover:underline"
                   >
                     {mode === "signUp" ? "Already have an account? Sign in" : "Create account"}
                   </button>
