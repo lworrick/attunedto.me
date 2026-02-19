@@ -22,7 +22,8 @@ export default function AuthPage() {
     e.preventDefault();
     setMessage(null);
     setLoading(true);
-    const { error } = await supabase.auth.signUp({ email, password });
+    const redirectTo = typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined;
+    const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } });
     setLoading(false);
     if (error) {
       setMessage({ type: "err", text: error.message });
@@ -48,7 +49,8 @@ export default function AuthPage() {
     e.preventDefault();
     setMessage(null);
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOtp({ email });
+    const redirectTo = typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined;
+    const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: redirectTo } });
     setLoading(false);
     if (error) {
       setMessage({ type: "err", text: error.message });
