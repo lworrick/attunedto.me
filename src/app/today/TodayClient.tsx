@@ -137,18 +137,18 @@ export function TodayClient(props: Props) {
       sleep_quality_avg: display.sleepAvg ?? undefined,
       stress_level_avg: display.stressAvg ?? undefined,
     };
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !key) return;
-    fetch(`${url}/functions/v1/daily-summary`, {
+    fetch("/api/daily-summary", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     })
       .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
       .then(({ ok, data }) => {
         if (!ok) setSnapshotError("Snapshot is taking a short break.");
-        else if (data && !(typeof data === "object" && "error" in data)) setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
+        else if (data && !(typeof data === "object" && "error" in data)) {
+          setSnapshotError(null);
+          setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
+        }
       })
       .catch(() => setSnapshotError("Snapshot is taking a short break."));
   }, [display.nutrition, display.waterTotal, display.movement, display.cravingsCount, display.cravingsAvgIntensity, display.sleepAvg, display.stressAvg]);
@@ -164,22 +164,18 @@ export function TodayClient(props: Props) {
       sleep_quality_avg: display.sleepAvg ?? undefined,
       stress_level_avg: display.stressAvg ?? undefined,
     };
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !key) {
-      setInsightsLoading(false);
-      return;
-    }
-    fetch(`${url}/functions/v1/daily-summary`, {
+    fetch("/api/daily-summary", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     })
       .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
       .then(({ ok, data }) => {
         setInsightsLoading(false);
-        if (ok && data && !(typeof data === "object" && "error" in data)) setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
-        else if (!ok) setSnapshotError("Snapshot is taking a short break.");
+        if (ok && data && !(typeof data === "object" && "error" in data)) {
+          setSnapshotError(null);
+          setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
+        } else if (!ok) setSnapshotError("Snapshot is taking a short break.");
       })
       .catch(() => {
         setInsightsLoading(false);
