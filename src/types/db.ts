@@ -86,6 +86,9 @@ export interface DailyRollup {
   calories_max_total: number;
   protein_total: number;
   fiber_total: number;
+  carbs_total: number;
+  fat_total: number;
+  sugar_total: number;
   water_total: number;
   movement_min_total: number;
   burn_min_total: number;
