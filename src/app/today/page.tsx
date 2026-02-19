@@ -7,16 +7,17 @@ export default async function TodayPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth");
 
-  const today = new Date().toISOString().slice(0, 10);
-  const todayEnd = today + "T23:59:59.999Z";
+  const n = new Date();
+  const todayStart = new Date(n.getFullYear(), n.getMonth(), n.getDate(), 0, 0, 0, 0).toISOString();
+  const todayEnd = new Date(n.getFullYear(), n.getMonth(), n.getDate(), 23, 59, 59, 999).toISOString();
 
   const [foodRes, waterRes, moveRes, cravingRes, sleepRes, stressRes] = await Promise.all([
-    supabase.from("food_logs").select("calories_min, calories_max, protein_g, carbs_g, fat_g, fiber_g, sugar_g").gte("timestamp", today).lt("timestamp", todayEnd),
-    supabase.from("water_logs").select("ounces").gte("timestamp", today).lt("timestamp", todayEnd),
-    supabase.from("movement_logs").select("duration_min, estimated_burn_min, estimated_burn_max").gte("timestamp", today).lt("timestamp", todayEnd),
-    supabase.from("craving_logs").select("intensity").gte("timestamp", today).lt("timestamp", todayEnd),
-    supabase.from("sleep_logs").select("sleep_quality").gte("timestamp", today).lt("timestamp", todayEnd),
-    supabase.from("stress_logs").select("stress_level").gte("timestamp", today).lt("timestamp", todayEnd),
+    supabase.from("food_logs").select("calories_min, calories_max, protein_g, carbs_g, fat_g, fiber_g, sugar_g").gte("timestamp", todayStart).lt("timestamp", todayEnd),
+    supabase.from("water_logs").select("ounces").gte("timestamp", todayStart).lt("timestamp", todayEnd),
+    supabase.from("movement_logs").select("duration_min, estimated_burn_min, estimated_burn_max").gte("timestamp", todayStart).lt("timestamp", todayEnd),
+    supabase.from("craving_logs").select("intensity").gte("timestamp", todayStart).lt("timestamp", todayEnd),
+    supabase.from("sleep_logs").select("sleep_quality").gte("timestamp", todayStart).lt("timestamp", todayEnd),
+    supabase.from("stress_logs").select("stress_level").gte("timestamp", todayStart).lt("timestamp", todayEnd),
   ]);
 
   const nutrition = foodRes.data?.length
