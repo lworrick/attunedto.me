@@ -145,15 +145,20 @@ export function TodayClient(props: Props) {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify(body),
     })
-      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
-      .then(({ ok, data }) => {
-        if (!ok) setSnapshotError("Snapshot is taking a short break.");
-        else if (data && !(typeof data === "object" && "error" in data)) {
+      .then((res) => res.json().then((data) => ({ ok: res.ok, status: res.status, data })))
+      .then(({ ok, status, data }) => {
+        if (!ok) {
+          const msg = data && typeof data === "object" && "error" in data ? String((data as { error?: string }).error) : null;
+          setSnapshotError(msg || `Snapshot couldn’t load (${status}). Try Generate below.`);
+        } else if (data && !(typeof data === "object" && "error" in data)) {
           setSnapshotError(null);
           setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
         }
       })
-      .catch(() => setSnapshotError("Snapshot is taking a short break."));
+      .catch((err) => {
+        console.warn("[daily-summary]", err);
+        setSnapshotError("Snapshot is taking a short break. Try Generate below.");
+      });
   }, [display.nutrition, display.waterTotal, display.movement, display.cravingsCount, display.cravingsAvgIntensity, display.sleepAvg, display.stressAvg]);
 
   function handleGenerateInsights() {
@@ -178,17 +183,21 @@ export function TodayClient(props: Props) {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify(body),
     })
-      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
-      .then(({ ok, data }) => {
+      .then((res) => res.json().then((data) => ({ ok: res.ok, status: res.status, data })))
+      .then(({ ok, status, data }) => {
         setInsightsLoading(false);
         if (ok && data && !(typeof data === "object" && "error" in data)) {
           setSnapshotError(null);
           setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
-        } else if (!ok) setSnapshotError("Snapshot is taking a short break.");
+        } else {
+          const msg = data && typeof data === "object" && "error" in data ? String((data as { error?: string }).error) : null;
+          setSnapshotError(msg || `Snapshot couldn’t load (${status}). Try again in a moment.`);
+        }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.warn("[daily-summary]", err);
         setInsightsLoading(false);
-        setSnapshotError("Snapshot is taking a short break.");
+        setSnapshotError("Snapshot is taking a short break. Try again in a moment.");
       });
   }
 
