@@ -148,8 +148,10 @@ export function TodayClient(props: Props) {
       .then((res) => res.json().then((data) => ({ ok: res.ok, status: res.status, data })))
       .then(({ ok, status, data }) => {
         if (!ok) {
-          const msg = data && typeof data === "object" && "error" in data ? String((data as { error?: string }).error) : null;
-          setSnapshotError(msg || `Snapshot couldn’t load (${status}). Try Generate below.`);
+          const obj = data && typeof data === "object" ? (data as { error?: string; details?: string }) : null;
+          const msg = obj?.error ?? `Snapshot couldn’t load (${status}). Try Generate below.`;
+          const details = obj?.details ? ` ${obj.details}` : "";
+          setSnapshotError(msg + details);
         } else if (data && !(typeof data === "object" && "error" in data)) {
           setSnapshotError(null);
           setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
@@ -190,8 +192,10 @@ export function TodayClient(props: Props) {
           setSnapshotError(null);
           setSnapshot(data as { summary_text?: string; suggestion?: string; supportive_line?: string });
         } else {
-          const msg = data && typeof data === "object" && "error" in data ? String((data as { error?: string }).error) : null;
-          setSnapshotError(msg || `Snapshot couldn’t load (${status}). Try again in a moment.`);
+          const obj = data && typeof data === "object" ? (data as { error?: string; details?: string }) : null;
+          const msg = obj?.error ?? `Snapshot couldn’t load (${status}). Try again in a moment.`;
+          const details = obj?.details ? ` ${obj.details}` : "";
+          setSnapshotError(msg + details);
         }
       })
       .catch((err) => {
